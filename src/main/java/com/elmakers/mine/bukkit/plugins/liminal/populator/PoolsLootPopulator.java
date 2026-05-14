@@ -1,8 +1,6 @@
 package com.elmakers.mine.bukkit.plugins.liminal.populator;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Material;
@@ -42,7 +40,7 @@ public class PoolsLootPopulator extends LiminalPopulator {
     public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion region) {
         final LiminalWorldPlugin plugin = getPlugin();
         if (lootTable == null || !lootTable.isPresent(random)) return;
-        final LootDrop drop = lootTable.getDrop(random);
+        final LootDrop drop = lootTable.get(random);
 
         final int chunkGlobalX = chunkX << 4;
         final int chunkGlobalZ = chunkZ << 4;

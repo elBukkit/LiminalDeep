@@ -6,8 +6,9 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.random.WeightedElement;
 
-public class LootDrop {
+public class LootDrop implements WeightedElement {
     private final LiminalGenerator generator;
     private final String blockData;
     private final List<String> items;
@@ -28,6 +29,7 @@ public class LootDrop {
         return items;
     }
 
+    @Override
     public double getWeight() {
         return weight;
     }
