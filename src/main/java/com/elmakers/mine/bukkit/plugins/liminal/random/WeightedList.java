@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 public class WeightedList<T extends WeightedElement> {
-    private final List<T> elements = new ArrayList<>();
-    private double totalWeight = 0;
+    protected final List<T> elements = new ArrayList<>();
+    protected double totalWeight = 0;
 
     public void add(T element) {
         elements.add(element);

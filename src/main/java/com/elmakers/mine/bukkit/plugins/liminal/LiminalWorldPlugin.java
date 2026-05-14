@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +18,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
-import com.elmakers.mine.bukkit.plugins.liminal.generator.OceanGenerator;
-import com.elmakers.mine.bukkit.plugins.liminal.generator.PoolsGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.ChunkListener;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.PlayerListener;
 
@@ -26,6 +25,8 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
     private static int CURRENT_VERSION = 1;
 
     private Map<String, LiminalWorld> worlds = new HashMap();
+    private Map<String, ConfigurationSection> populatorConfigs = new HashMap();
+    private Map<String, ConfigurationSection> roomConfigs = new HashMap();
     private LiminalCommandExecutor commandExecutor;
     private PlayerListener playerListener;
     private ChunkListener chunkListener;
@@ -45,6 +46,19 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
         }
         defaultWorld = generalConfig.getString("default_world");
 
+        // Load Populators
+        ConfigurationSection populatorConfigs = configuration.getConfigurationSection("populators");
+        for (String key : populatorConfigs.getKeys(false)) {
+            this.populatorConfigs.put(key, populatorConfigs.getConfigurationSection(key));
+        }
+
+        // Load Rooms
+        ConfigurationSection roomConfigs = configuration.getConfigurationSection("rooms");
+        for (String key : roomConfigs.getKeys(false)) {
+            this.roomConfigs.put(key, roomConfigs.getConfigurationSection(key));
+        }
+
+        // Load Worlds
         ConfigurationSection worldConfigs = configuration.getConfigurationSection("worlds");
         for (String key : worldConfigs.getKeys(false)) {
             LiminalWorld world = new LiminalWorld(this, key, generalConfig, worldConfigs.getConfigurationSection(key));
@@ -127,16 +141,6 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
         return new ArrayList(worlds.keySet());
     }
 
-    public LiminalGenerator createGenerator(LiminalWorld world, String key, ConfigurationSection generalConfig, ConfigurationSection config) {
-        switch (key) {
-            case "pools": return new PoolsGenerator(world, generalConfig, config);
-            case "ocean": return new OceanGenerator(world, generalConfig, config);
-            default:
-                getLogger().severe("Unknown generator type: " + key);
-                return null;
-        }
-    }
-
     public LiminalWorld getDefaultWorld() {
         return getWorld(defaultWorld);
     }
@@ -155,7 +159,70 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
         return itemStack;
     }
 
+    public ConfigurationSection combineConfigurations(ConfigurationSection overrides, ConfigurationSection inherit) {
+        final ConfigurationSection combined = new MemoryConfiguration();
+        for (String inheritKey : inherit.getKeys(true)) {
+            if (!overrides.contains(inheritKey)) {
+                combined.set(inheritKey, inherit.get(inheritKey));
+            }
+        }
+        for (String overrideKey : overrides.getKeys(true)) {
+            combined.set(overrideKey, overrides.get(overrideKey));
+        }
+        return combined;
+    }
+
+    private ConfigurationSection processInheritedConfig(ConfigurationSection config, Map<String, ConfigurationSection> templates) {
+        if (config == null) return  null;
+        String inheritId = config.getString("inherit");
+        while (inheritId != null) {
+            ConfigurationSection inheritConfig = templates.get(inheritId);
+            if (inheritConfig != null) {
+                inheritId = inheritConfig.getString("inherit");
+                config = combineConfigurations(config, inheritConfig);
+            } else {
+                getLogger().warning("Invalid inherit id: " + inheritId);
+                break;
+            }
+        }
+        return config;
+    }
+
+    private ConfigurationSection processRoomConfig(ConfigurationSection config) {
+        return processInheritedConfig(config, roomConfigs);
+    }
+
+    private ConfigurationSection processPopulatorConfig(ConfigurationSection config) {
+        return processInheritedConfig(config, populatorConfigs);
+    }
+
     public List<String> getItemKeys() {
         return itemGenerator.getItemKeys();
+    }
+
+    public ConfigurationSection getRoomConfig(String id) {
+        return processRoomConfig(roomConfigs.get(id));
+    }
+
+    public ConfigurationSection getRoomConfig(ConfigurationSection config) {
+        String id = config.getString("id");
+        ConfigurationSection templateConfig = getRoomConfig(id);
+        if (templateConfig != null) {
+            return templateConfig;
+        }
+        return config;
+    }
+
+    public ConfigurationSection getPopulatorConfig(String id) {
+        return processPopulatorConfig(populatorConfigs.get(id));
+    }
+
+    public ConfigurationSection getPopulatorConfig(ConfigurationSection config) {
+        String id = config.getString("id");
+        ConfigurationSection templateConfig = getPopulatorConfig(id);
+        if (templateConfig != null) {
+            return templateConfig;
+        }
+        return config;
     }
 }

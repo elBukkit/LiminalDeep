@@ -17,29 +17,19 @@ import org.bukkit.inventory.ItemStack;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.LootDrop;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.LootTable;
-import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
-public class PoolsLootPopulator extends LiminalPopulator {
+public class LootPopulator extends LiminalPopulator {
     private final LootTable lootTable;
-    private int FLOOR_LEVEL = 62;
 
-    public PoolsLootPopulator(LiminalGenerator generator, ConfigurationSection config) {
-        super(generator);
-
-        FLOOR_LEVEL = config.getInt("floor_level", FLOOR_LEVEL);
-
-        ConfigurationSection lootConfig = config.getConfigurationSection("loot");
-        if (lootConfig != null) {
-            lootTable = new LootTable(generator, lootConfig);
-        } else {
-            lootTable = null;
-        }
+    public LootPopulator(LiminalRoom room, ConfigurationSection config) {
+        super(room);
+        lootTable = new LootTable(room.getWorld(), config);
     }
 
     @Override
     public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion region) {
         final LiminalWorldPlugin plugin = getPlugin();
-        if (lootTable == null || !lootTable.isPresent(random)) return;
         final LootDrop drop = lootTable.get(random);
 
         final int chunkGlobalX = chunkX << 4;
@@ -49,7 +39,7 @@ public class PoolsLootPopulator extends LiminalPopulator {
         final int lootSide = random.nextInt(2);
 
         final int lookDirection = lootSide == 0 ? 1 : -1;
-        final int y = FLOOR_LEVEL + 2;
+        final int y = room.getFloorLevel() + 2;
         int x;
         int z;
         int deltaX;

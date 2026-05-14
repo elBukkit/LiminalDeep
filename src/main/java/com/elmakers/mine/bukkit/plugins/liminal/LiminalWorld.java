@@ -16,6 +16,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
+import com.elmakers.mine.bukkit.plugins.liminal.populator.WaterfallPopulator;
+import com.elmakers.mine.bukkit.plugins.liminal.populator.LootPopulator;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.OceanRoom;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.PoolsRoom;
 
 public class LiminalWorld {
     protected final String name;
@@ -24,8 +30,8 @@ public class LiminalWorld {
     protected final int time;
     protected final boolean rain;
     protected final String title;
-    protected final String nextLevel;
     protected final int titleDelay;
+    protected Long seed;
     private World world;
 
     public LiminalWorld(LiminalWorldPlugin plugin, String name, ConfigurationSection generalConfig, ConfigurationSection config) {
@@ -34,17 +40,15 @@ public class LiminalWorld {
         time = config.getInt("time", 0);
         title = config.getString("title");
         titleDelay = config.getInt("title_delay", generalConfig.getInt("title_delay", 0));
-        nextLevel = config.getString("next_level");
         rain = config.getBoolean("rain");
-        generator = createGenerator(generalConfig, config);
+        if (config.contains("seed")) {
+            seed = config.getLong("seed");
+        }
+        generator = new LiminalGenerator(this, config);
     }
 
-    protected LiminalGenerator createGenerator(ConfigurationSection generalConfig, ConfigurationSection config) {
-        return plugin.createGenerator(this, config.getString("generator"), generalConfig, config);
-    }
-
-    public String getNextLevel() {
-        return nextLevel;
+    public String getNextLevel(Location location) {
+        return getRoomAt(location.getChunk()).getNextLevel();
     }
 
     public void enter(Player player) {
@@ -61,15 +65,15 @@ public class LiminalWorld {
     }
 
     public void checkNewChunk(Chunk chunk) {
-        generator.checkNewChunk(chunk);
+        getRoomAt(chunk).checkNewChunk(chunk);
     }
 
     public Location getSpawnLocation() {
-        return generator.getSpawnLocation(getWorld());
+        return getStartingRoom().getSpawnLocation(getWorld());
     }
 
     public Location getEntryLocation() {
-        return generator.getEntryLocation(getWorld());
+        return getStartingRoom().getEntryLocation(getWorld());
     }
 
     public Logger getLogger() {
@@ -88,7 +92,13 @@ public class LiminalWorld {
         if (world == null) {
             world = plugin.getServer().getWorld(name);
             if (world == null) {
-                world = Bukkit.createWorld(new WorldCreator(name).generator(generator));
+                final WorldCreator creator = new WorldCreator(name).generator(generator);
+                if (seed != null) {
+                    creator.seed(seed);
+                } else {
+                    seed = creator.seed();
+                }
+                world = Bukkit.createWorld(creator);
             }
             if (world == null) {
                 plugin.getLogger().severe("Unable to create world " + name);
@@ -122,5 +132,67 @@ public class LiminalWorld {
 
         world.setStorm(rain);
         world.setTime(time);
+    }
+
+    public LiminalRoom getRoomAt(Chunk chunk) {
+        return getRoomAt(chunk.getX(), chunk.getZ());
+    }
+
+    public LiminalRoom getRoomAt(int chunkX, int chunkZ) {
+        if (seed == null) {
+            getLogger().severe("Seed not set for world " + name);
+            return null;
+        }
+        return generator.getRooms().getRoomAt(chunkX, chunkZ, seed);
+    }
+
+    public LiminalRoom getStartingRoom() {
+        return getRoomAt(0, 0);
+    }
+
+    public LiminalRoom createRoom(String id) {
+        ConfigurationSection config = plugin.getRoomConfig(id);
+        if (config == null) {
+            plugin.getLogger().severe("Invalid room id: " + id);
+            return null;
+        }
+        return createRoom(config);
+    }
+
+    public LiminalRoom createRoom(ConfigurationSection config) {
+        config = plugin.getRoomConfig(config);
+        final String roomType = config.getString("type", "");
+        switch (roomType) {
+            case "pools":
+                return new PoolsRoom(this, config);
+            case "ocean":
+                return new OceanRoom(this, config);
+            default:
+                plugin.getLogger().severe("Unknown room type: " + roomType);
+                return null;
+        }
+    }
+
+    public LiminalPopulator createPopulator(LiminalRoom room, String id) {
+        ConfigurationSection config = plugin.getPopulatorConfig(id);
+        if (config == null) {
+            plugin.getLogger().severe("Invalid populator id: " + id);
+            return null;
+        }
+        return createPopulator(room, config);
+    }
+
+    public LiminalPopulator createPopulator(LiminalRoom room, ConfigurationSection config) {
+        config = plugin.getPopulatorConfig(config);
+        final String roomType = config.getString("type", "");
+        switch (roomType) {
+            case "waterfall":
+                return new WaterfallPopulator(room, config);
+            case "loot":
+                return new LootPopulator(room, config);
+            default:
+                plugin.getLogger().severe("Unknown populator type: " + roomType);
+                return null;
+        }
     }
 }

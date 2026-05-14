@@ -3,14 +3,39 @@ general:
   title_delay: 8000
   default_world: pools
 
-worlds:
-  pools:
-    generator: pools
+populators:
+
+  pools_exit:
+    type: waterfall
     next_level: dark_pools
-    title_delay: 2000
-    title: "&bThe Shallow Pools"
-    time: 6000
-    biome: lush_caves
+    command_blocks: true
+    exit_level: -32
+
+  dark_pools_loot:
+    type: loot
+    drops:
+      shears:
+        block: barrel
+        weight: 0.2
+        items:
+          - kelp_shears
+      smoker:
+        block: smoker
+        weight: 1
+        items:
+          - air
+          - coal
+
+  dark_pools_exit:
+    type: waterfall
+    next_level: ocean
+    command_blocks: true
+    exit_level: -32
+
+rooms:
+
+  pools:
+    type: pools
     bedrock_level: 60
     floor_level: 62
     roof_min_height: 6
@@ -39,20 +64,17 @@ worlds:
       - quartz_block
     light_blocks:
       - sea_lantern
-    exit:
-      min_distance: 640
-      max_distance: 3200
-      max_probability: 0.1
-      command_blocks: true
-      exit_level: -32
+
+  pools_exit:
+    min_distance: 640
+    max_distance: 3200
+    weight: 0.1
+    inherit: pools
+    populators:
+      - pools_exit
 
   dark_pools:
-    generator: pools
-    next_level: ocean
-    title: "&3The Dark Pools"
-    time: 14000
-    rain: true
-    biome: lush_caves
+    type: pools
     food_location: 7
     bedrock_level: 20
     sunroof_probability: 0.25
@@ -91,35 +113,58 @@ worlds:
       - quartz_block
     light_blocks:
       - sea_lantern
-    loot:
-      probability: 0.05
-      drops:
-        shears:
-          block: barrel
-          weight: 0.2
-          items:
-            - kelp_shears
-        smoker:
-          probability: 0.05
-          weight: 1
-          items:
-            - air
-            - coal
-    exit:
-      min_distance: 640
-      max_distance: 3200
-      max_probability: 0.1
-      command_blocks: true
-      exit_level: -32
+    populators:
+      - dark_pools_loot
+
+  dark_pools_exit:
+    inherit: dark_pools
+    min_distance: 640
+    max_distance: 3200
+    weight: 0.2
+    populators:
+      - dark_pools_exit
+
+  dark_pools_loot:
+    inherit: dark_pools
+    min_distance: 64
+    max_distance: 256
+    weight: 0.1
+    populators:
+      - dark_pools_loot
 
   ocean:
-    generator: ocean
-    title: "&8The Abyss"
-    biome: deep_ocean
-    time: 18000
+    type: ocean
     sea_level: 190
     sand_level: 6
     bedrock_level: 1
+
+worlds:
+
+  pools:
+    title_delay: 2000
+    title: "&bThe Shallow Pools"
+    time: 6000
+    biome: lush_caves
+    rooms:
+      - pools
+      - pools_exit
+
+  dark_pools:
+    title: "&3The Dark Pools"
+    time: 14000
+    rain: true
+    biome: lush_caves
+    rooms:
+      - dark_pools
+      - dark_pools_exit
+      - dark_pools_loot
+
+  ocean:
+    title: "&8The Abyss"
+    biome: deep_ocean
+    time: 18000
+    rooms:
+      - ocean
 
 items:
   diving_helmet:

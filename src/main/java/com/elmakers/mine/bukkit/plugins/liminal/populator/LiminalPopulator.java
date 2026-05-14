@@ -5,27 +5,27 @@ import org.bukkit.generator.BlockPopulator;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
-import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
 public class LiminalPopulator extends BlockPopulator {
-    protected final LiminalGenerator generator;
+    protected final LiminalRoom room;
 
-    public LiminalPopulator(LiminalGenerator generator) {
-        this.generator = generator;
+    public LiminalPopulator(LiminalRoom room) {
+        this.room = room;
     }
 
     public void checkNewChunk(Chunk chunk) {
     }
 
-    public LiminalGenerator getGenerator() {
-        return generator;
+    public String getNextLevel() {
+        return null;
     }
 
     public LiminalWorld getWorld() {
-        return generator.getWorld();
+        return room.getWorld();
     }
 
     public LiminalWorldPlugin getPlugin() {
-        return generator.getPlugin();
+        return getWorld().getPlugin();
     }
 }

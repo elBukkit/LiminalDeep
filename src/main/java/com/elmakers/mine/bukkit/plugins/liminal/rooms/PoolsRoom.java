@@ -1,6 +1,8 @@
-package com.elmakers.mine.bukkit.plugins.liminal.generator;
+package com.elmakers.mine.bukkit.plugins.liminal.rooms;
 
-import org.bukkit.Chunk;
+import java.util.Locale;
+import java.util.Random;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -11,23 +13,15 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.GlowLichen;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.FoodType;
-import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
-import com.elmakers.mine.bukkit.plugins.liminal.populator.PoolsExitPopulator;
-import com.elmakers.mine.bukkit.plugins.liminal.populator.PoolsLootPopulator;
 
-public class PoolsGenerator extends LiminalGenerator {
+public class PoolsRoom extends LiminalRoom {
     private int BEDROCK_LEVEL = 60;
     private int FLOOR_LEVEL = 62;
     private int ROOF_MIN_HEIGHT = 4;
@@ -52,8 +46,6 @@ public class PoolsGenerator extends LiminalGenerator {
     private double FLOODING_MIN_LEVEL = 1;
     private double FLOODING_MAX_LEVEL = 6;
     private FoodType foodType = FoodType.VINES;
-    private final LiminalPopulator exitPopulator;
-    private final LiminalPopulator lootPopulator;
     private final BlockData foodBlock;
 
     private Material[] FLOOR_BLOCKS = {
@@ -75,10 +67,8 @@ public class PoolsGenerator extends LiminalGenerator {
             Material.SEA_LANTERN
     };
 
-    public PoolsGenerator(LiminalWorld world, ConfigurationSection generalConfig, ConfigurationSection config) {
-        super(world, generalConfig, config);
-        exitPopulator = createExitPopulator(config);
-        lootPopulator = createLootPopulator(config);
+    public PoolsRoom(LiminalWorld world, ConfigurationSection config) {
+        super(world, config);
 
         BEDROCK_LEVEL = config.getInt("bedrock_level", BEDROCK_LEVEL);
         FLOOR_LEVEL = config.getInt("floor_level", FLOOR_LEVEL);
@@ -118,19 +108,6 @@ public class PoolsGenerator extends LiminalGenerator {
         WALL_BLOCKS = plugin.getMaterials(config, "wall_blocks", WALL_BLOCKS);
         CEILING_BLOCKS = plugin.getMaterials(config, "ceiling_blocks", CEILING_BLOCKS);
         LIGHT_BLOCKS = plugin.getMaterials(config, "light_blocks", LIGHT_BLOCKS);
-    }
-
-    protected LiminalPopulator createExitPopulator(ConfigurationSection config) {
-        return new PoolsExitPopulator(this, config);
-    }
-
-    protected LiminalPopulator createLootPopulator(ConfigurationSection config) {
-        return new PoolsLootPopulator(this, config);
-    }
-
-    @Override
-    public List<BlockPopulator> getDefaultPopulators(World world) {
-        return List.of(exitPopulator, lootPopulator);
     }
 
     private BlockData getWindowBlock() {
@@ -346,7 +323,12 @@ public class PoolsGenerator extends LiminalGenerator {
     }
 
     @Override
-    public void checkNewChunk(Chunk chunk) {
-        exitPopulator.checkNewChunk(chunk);
+    public int getFloorLevel() {
+        return FLOOR_LEVEL;
+    }
+
+    @Override
+    public int getBedrockLevel() {
+        return BEDROCK_LEVEL;
     }
 }

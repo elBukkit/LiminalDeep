@@ -43,7 +43,7 @@ public class PlayerListener implements Listener {
         World world = player.getWorld();
         LiminalWorld liminalWorld = plugin.getWorld(world.getName());
         if (liminalWorld != null) {
-            String nextLevel = liminalWorld.getNextLevel();
+            String nextLevel = liminalWorld.getNextLevel(player.getLocation());
             if (nextLevel != null && !nextLevel.isEmpty()) {
                 Location entryLocation = plugin.getEntryLocation(nextLevel);
                 event.setTo(entryLocation);
