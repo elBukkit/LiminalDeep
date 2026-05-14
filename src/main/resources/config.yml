@@ -19,6 +19,41 @@ populators:
         weight: 0.2
         items:
           - kelp_shears
+      diving_helmet:
+        block: barrel
+        weight: 0.1
+        items:
+          - diving_helmet
+      coal:
+        block: barrel
+        weight: 0.1
+        items:
+          - coal
+      smoker:
+        block: smoker
+        weight: 1
+        items:
+          - air
+          - coal
+
+  dark_pools_vault_loot:
+    type: loot
+    x: 8
+    z: 8
+    y: 2
+    drops:
+      shears:
+        block: warped_shelf
+        items:
+          - kelp_shears
+          - diving_helmet
+
+  dark_pools_vault_smoker:
+    type: loot
+    x: 8
+    z: 8
+    y: 1
+    drops:
       smoker:
         block: smoker
         weight: 1
@@ -93,7 +128,7 @@ rooms:
     island_probability: 0.75
     pool_probability: 0.75
     double_door_probability: 0.1
-    food_probability: 0.05
+    food_probability: 0.1
     underwater_food_probability: 0.2
     food_type: underwater
     food_block: minecraft:kelp
@@ -113,8 +148,6 @@ rooms:
       - quartz_block
     light_blocks:
       - sea_lantern
-    populators:
-      - dark_pools_loot
 
   dark_pools_exit:
     inherit: dark_pools
@@ -126,11 +159,46 @@ rooms:
 
   dark_pools_loot:
     inherit: dark_pools
-    min_distance: 64
-    max_distance: 256
-    weight: 0.1
+    min_distance: 256
+    max_distance: 1024
+    weight: 0.05
     populators:
       - dark_pools_loot
+
+  dark_pools_vault:
+    inherit: dark_pools
+    min_distance: 32
+    max_distance: 1024
+    weight: 0.1
+    hallway_min_width_half: 6
+    hallway_max_width_half: 6
+    doorway_max_width_half: 6
+    doorway_min_width_half: 6
+    sunroof_probability: 0.75
+    doorway_min_height: 4
+    doorway_max_height: 4
+    roof_min_height: 4
+    roof_max_height: 6
+    light_probability: 1
+    floor_light_probability: 1
+    wall_probability: 1
+    window_probability: 0
+    island_probability: 1
+    pool_probability: 0
+    double_door_probability: 1
+    food_probability: 0
+    flooding_probability: 0
+    populators:
+      - dark_pools_vault_loot
+      - dark_pools_vault_smoker
+    floor_blocks:
+      - quartz_block
+    wall_blocks:
+      - iron_block
+    ceiling_blacks:
+      - iron_block
+    light_blocks:
+      - glowstone
 
   ocean:
     type: ocean
@@ -158,6 +226,7 @@ worlds:
       - dark_pools
       - dark_pools_exit
       - dark_pools_loot
+      - dark_pools_vault
 
   ocean:
     title: "&8The Abyss"

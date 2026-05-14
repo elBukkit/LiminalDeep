@@ -7,11 +7,13 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.Shelf;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
@@ -21,10 +23,24 @@ import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
 public class LootPopulator extends LiminalPopulator {
     private final LootTable lootTable;
+    private final Integer x;
+    private final Integer z;
+    private final int y;
 
     public LootPopulator(LiminalRoom room, ConfigurationSection config) {
         super(room);
         lootTable = new LootTable(room.getWorld(), config);
+        if (config.contains("x")) {
+            x = config.getInt("x");
+        } else {
+            x = null;
+        }
+        if (config.contains("z")) {
+            z = config.getInt("z");
+        } else {
+            z = null;
+        }
+        y = config.getInt("y", 2);
     }
 
     @Override
@@ -39,7 +55,7 @@ public class LootPopulator extends LiminalPopulator {
         final int lootSide = random.nextInt(2);
 
         final int lookDirection = lootSide == 0 ? 1 : -1;
-        final int y = room.getFloorLevel() + 2;
+        final int y = room.getFloorLevel() + this.y;
         int x;
         int z;
         int deltaX;
@@ -84,8 +100,8 @@ public class LootPopulator extends LiminalPopulator {
             z += deltaZ;
             blockState = region.getBlockState(chunkGlobalX + x, y, chunkGlobalZ + z);
         }
-        int barrelX = chunkGlobalX + x;
-        int barrelZ = chunkGlobalZ + z;
+        int barrelX = chunkGlobalX + (this.x == null ? x : this.x);
+        int barrelZ = chunkGlobalZ + (this.z == null ? z : this.z);
         BlockData containerBlock = drop.getBlockData();
         if (containerBlock instanceof Directional) {
             Directional directional = (Directional)containerBlock;
@@ -94,15 +110,22 @@ public class LootPopulator extends LiminalPopulator {
         region.setBlockData(barrelX, y, barrelZ, containerBlock);
         final List<String> items = drop.getItems();
 
-        BlockState barrelState = region.getBlockState(barrelX, y, barrelZ);
-        if (barrelState instanceof Container && !items.isEmpty()) {
-            Container barrel = (Container)barrelState;
+        final BlockState containerState = region.getBlockState(barrelX, y, barrelZ);
+        Inventory inventory = null;
+        if (containerState instanceof Container) {
+            final Container container = (Container)containerState;
+            inventory = container.getInventory();
+        } else if (containerState instanceof Shelf) {
+            final Shelf shelf = (Shelf)containerState;
+            inventory = shelf.getInventory();
+        }
+        if (inventory != null && !items.isEmpty()) {
             for (int slot = 0; slot < items.size(); slot++) {
                 ItemStack itemStack = plugin.createItem(items.get(slot));
                 if (itemStack == null) {
                     itemStack = new ItemStack(Material.AIR);
                 }
-                barrel.getInventory().setItem(slot, itemStack);
+                inventory.setItem(slot, itemStack);
             }
         }
     }

@@ -20,6 +20,7 @@ import org.jspecify.annotations.NonNull;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.FoodType;
+import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
 
 public class PoolsRoom extends LiminalRoom {
     private int BEDROCK_LEVEL = 60;
@@ -28,6 +29,7 @@ public class PoolsRoom extends LiminalRoom {
     private int ROOF_MAX_HEIGHT = 10;
     private int DOORWAY_MIN_HEIGHT = 2;
     private int DOORWAY_MAX_HEIGHT = 4;
+    private int DOORWAY_MIN_WIDTH_HALF = 0;
     private int DOORWAY_MAX_WIDTH_HALF = 3;
     private int WALKWAY_MAX_WIDTH_HALF = 5;
     private int HALLWAY_MAX_WIDTH_HALF = 0;
@@ -41,10 +43,11 @@ public class PoolsRoom extends LiminalRoom {
     private double FOOD_PROBABILITY = 0.01;
     private double UNDERWATER_FOOD_PROBABILITY = 1;
     private double LIGHT_PROBABILITY = 1;
+    private double FLOOR_LIGHT_PROBABILITY = 0;
     private double SUNROOF_PROBABILITY = 1;
     private double FLOODING_PROBABILITY = 0;
-    private double FLOODING_MIN_LEVEL = 1;
-    private double FLOODING_MAX_LEVEL = 6;
+    private int FLOODING_MIN_LEVEL = 1;
+    private int FLOODING_MAX_LEVEL = 6;
     private FoodType foodType = FoodType.VINES;
     private final BlockData foodBlock;
 
@@ -77,6 +80,7 @@ public class PoolsRoom extends LiminalRoom {
         DOORWAY_MIN_HEIGHT = config.getInt("doorway_min_height", DOORWAY_MIN_HEIGHT);
         DOORWAY_MAX_HEIGHT = config.getInt("doorway_max_height", DOORWAY_MAX_HEIGHT);
         DOORWAY_MAX_WIDTH_HALF = config.getInt("doorway_max_width_half", DOORWAY_MAX_WIDTH_HALF);
+        DOORWAY_MIN_WIDTH_HALF = config.getInt("doorway_min_width_half", DOORWAY_MIN_WIDTH_HALF);
         WALKWAY_MAX_WIDTH_HALF = config.getInt("walkway_max_width_half", WALKWAY_MAX_WIDTH_HALF);
         WALL_PROBABILITY = config.getDouble("wall_probability", WALL_PROBABILITY);
         WINDOW_PROBABILITY = config.getDouble("window_probability", WINDOW_PROBABILITY);
@@ -87,12 +91,13 @@ public class PoolsRoom extends LiminalRoom {
         FOOD_PROBABILITY = config.getDouble("food_probability", FOOD_PROBABILITY);
         UNDERWATER_FOOD_PROBABILITY = config.getDouble("underwater_food_probability", UNDERWATER_FOOD_PROBABILITY);
         LIGHT_PROBABILITY = config.getDouble("light_probability", LIGHT_PROBABILITY);
+        FLOOR_LIGHT_PROBABILITY = config.getDouble("floor_light_probability", FLOOR_LIGHT_PROBABILITY);
         HALLWAY_MAX_WIDTH_HALF = config.getInt("hallway_max_width_half", HALLWAY_MAX_WIDTH_HALF);
         HALLWAY_MIN_WIDTH_HALF = config.getInt("hallway_min_width_half", HALLWAY_MIN_WIDTH_HALF);
         SUNROOF_PROBABILITY = config.getDouble("sunroof_probability", SUNROOF_PROBABILITY);
         FLOODING_PROBABILITY = config.getDouble("flooding_probability", FLOODING_PROBABILITY);
-        FLOODING_MIN_LEVEL = config.getDouble("flooding_min_level", FLOODING_MIN_LEVEL);
-        FLOODING_MAX_LEVEL = config.getDouble("flooding_mx_level", FLOODING_MAX_LEVEL);
+        FLOODING_MIN_LEVEL = config.getInt("flooding_min_level", FLOODING_MIN_LEVEL);
+        FLOODING_MAX_LEVEL = config.getInt("flooding_mx_level", FLOODING_MAX_LEVEL);
         String foodBlockData = config.getString("food_block", "");
         foodBlock = foodBlockData.isEmpty() ? null : world.getPlugin().getServer().createBlockData(foodBlockData);
 
@@ -131,26 +136,31 @@ public class PoolsRoom extends LiminalRoom {
         final LiminalWorldPlugin plugin = world.getPlugin();
         final boolean isStartingChunk = chunkX == 0 && chunkZ == 0;
         final int floorLevel = FLOOR_LEVEL;
-        final int roofLevel = floorLevel + random.nextInt(ROOF_MAX_HEIGHT - ROOF_MIN_HEIGHT) + ROOF_MIN_HEIGHT;
+        final int roofLevel = floorLevel + RandomUtils.range(random, ROOF_MIN_HEIGHT, ROOF_MAX_HEIGHT);
         final int roofMaxLevel = floorLevel + ROOF_MAX_HEIGHT;
-        final int doorwayLevel = Math.min(roofLevel, floorLevel + random.nextInt(DOORWAY_MAX_HEIGHT - DOORWAY_MIN_HEIGHT) + DOORWAY_MIN_HEIGHT);
-        final int doorwayWidthHalf = random.nextInt(DOORWAY_MAX_WIDTH_HALF);
+        final int doorwayLevel = Math.min(roofLevel, floorLevel + RandomUtils.range(random, DOORWAY_MIN_HEIGHT, DOORWAY_MAX_HEIGHT));
+        final int doorwayWidthHalf = RandomUtils.range(random, DOORWAY_MIN_WIDTH_HALF, DOORWAY_MAX_WIDTH_HALF);
         final int doorwayLeft = 7 - doorwayWidthHalf;
         final int doorwayRight = 9 + doorwayWidthHalf;
         final int walkwayWidthHalf = isStartingChunk ? 0 : random.nextInt(WALKWAY_MAX_WIDTH_HALF);
         final int walkwayLeft = 8 - walkwayWidthHalf;
         final int walkWayRight = 8 + walkwayWidthHalf;
+        final boolean canHaveWindow = doorwayWidthHalf < 4;
+        int xWindowLocation = 0;
+        int zWindowLocation = 0;
+        if (canHaveWindow) {
+            xWindowLocation = random.nextInt(4 - doorwayWidthHalf) + 1;
+            if (random.nextDouble() > 0.5) xWindowLocation = 15 - xWindowLocation;
+            zWindowLocation = random.nextInt(4 - doorwayWidthHalf) + 1;
+            if (random.nextDouble() > 0.5) zWindowLocation = 15 - zWindowLocation;
+        }
         final boolean hasXWall = random.nextDouble() < WALL_PROBABILITY;
         final boolean hasZWall = random.nextDouble() < WALL_PROBABILITY;
-        final boolean hasXWindow = random.nextDouble() < WINDOW_PROBABILITY;
-        final boolean hasZWindow = random.nextDouble() < WINDOW_PROBABILITY;
+        final boolean hasXWindow = canHaveWindow && random.nextDouble() < WINDOW_PROBABILITY;
+        final boolean hasZWindow = canHaveWindow && random.nextDouble() < WINDOW_PROBABILITY;
         final boolean hasIsland = !isStartingChunk && random.nextDouble() < ISLAND_PROBABILITY;
         final boolean hasPools = random.nextDouble() < POOL_PROBABILITY;
         final boolean hasSunRoof = isStartingChunk || random.nextDouble() < SUNROOF_PROBABILITY;
-        int xWindowLocation = random.nextInt(4 - doorwayWidthHalf) + 1;
-        if (random.nextDouble() > 0.5) xWindowLocation = 15 - xWindowLocation;
-        int zWindowLocation = random.nextInt(4 - doorwayWidthHalf) + 1;
-        if (random.nextDouble() > 0.5) zWindowLocation = 15 - zWindowLocation;
         final boolean hasDoubleDoor = random.nextDouble() < DOUBLE_DOOR_PROBABILITY;
         final boolean doorXSide = random.nextDouble() < 0.5;
         final boolean hasXDoor = hasDoubleDoor || doorXSide;
@@ -166,9 +176,10 @@ public class PoolsRoom extends LiminalRoom {
         final int lightsFirst = walkwayLeft / 2 + 1;
         final int lightsSecond = 16 - lightsFirst;
         final boolean isFlooded = hasSunRoof && random.nextDouble() < FLOODING_PROBABILITY;
+        final boolean hasFloorLights = random.nextDouble() < FLOOR_LIGHT_PROBABILITY;
         Levelled floodWater = null;
         if (isFlooded) {
-            int floodLevel = random.nextInt((int)(FLOODING_MAX_LEVEL - FLOODING_MIN_LEVEL)) + (int)FLOODING_MIN_LEVEL;
+            int floodLevel = RandomUtils.range(random, FLOODING_MIN_LEVEL, FLOODING_MAX_LEVEL);
             floodWater = (Levelled)plugin.getServer().createBlockData(Material.WATER);
             floodWater.setLevel(floodLevel);
         }
@@ -230,11 +241,14 @@ public class PoolsRoom extends LiminalRoom {
                 } else {
                     // Water and roof
                     chunk.setBlock(x, roofLevel, z, ceilingBlock);
+                    final boolean isCenterLight = (x == lightsFirst || x == lightsSecond) && (z == lightsFirst || z == lightsSecond);
                     if (hasPools) {
                         chunk.setBlock(x, floorLevel, z, waterBlock);
-                        if ((x == lightsFirst || x == lightsSecond) && (z == lightsFirst || z == lightsSecond)) {
+                        if (isCenterLight) {
                             chunk.setBlock(x, floorLevel - 1, z, lightMaterial);
                         }
+                    } else if (hasFloorLights && isCenterLight) {
+                        chunk.setBlock(x, floorLevel, z, lightMaterial);
                     } else {
                         chunk.setBlock(x, floorLevel, z, floorBlock);
                     }
@@ -300,7 +314,7 @@ public class PoolsRoom extends LiminalRoom {
                 // Fill in hallways after
                 boolean isCenterWalkway = isWalkway || x == 8 || z == 8;
                 if (!isCenterWalkway && (HALLWAY_MAX_WIDTH_HALF > 0 || HALLWAY_MIN_WIDTH_HALF > 0)) {
-                    int hallwayWidthHalf = random.nextInt(HALLWAY_MAX_WIDTH_HALF - HALLWAY_MIN_WIDTH_HALF) + HALLWAY_MIN_WIDTH_HALF;
+                    int hallwayWidthHalf = RandomUtils.range(random, HALLWAY_MIN_WIDTH_HALF, HALLWAY_MAX_WIDTH_HALF);
                     int hallwayLeft = 8 - hallwayWidthHalf;
                     int hallwayRight = 8 + hallwayWidthHalf;
                     if (isStartingChunk) {
