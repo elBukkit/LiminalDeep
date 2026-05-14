@@ -1,0 +1,31 @@
+/summon minecraft:armor_stand ~ ~ ~ {ArmorItems:[{},{},{}, {id:"minecraft:stick", custom_model_data={floats:[8888]}]}
+
+/summon minecraft:armor_stand ~ ~ ~ {ArmorItems:[{},{},{}, {id:"minecraft:stick"}]}
+
+/summon minecraft:armor_stand ~ ~ ~ {equipment:{head:{id:"minecraft:stick", custom_model_data={floats:[8888]}}}
+
+/summon minecraft:armor_stand ~ ~ ~ {equipment:{head:{id:"minecraft:torch",custom_model_data:{floats:[8888]}}}}
+
+/give @p torch[custom_model_data={floats:[8888]}]
+
+/give @p stick[custom_model_data={floats:[18001]}]
+
+/give @p acacia_sapling[custom_model_data={floats:[20000]}]
+
+/summon minecraft:armor_stand ~ ~ ~ {Invisible:true,attributes:[{id:"scale",base:5.0}],equipment:{head:{id:"minecraft:torch",Count:1,components:{custom_model_data:{floats:[8888]}}}}}
+
+/summon minecraft:dolphin ~ ~ ~ {attributes:[{id:"scale",base:5.0}],Passengers:[{id:"armor_stand",Invisible:true,equipment:{head:{id:"minecraft:torch",Count:1,components:{custom_model_data:{floats:[8888]}}}}}]}
+
+/summon minecraft:frog ~ ~ ~ {active_effects:[{id:invisibility,duration:-1,amplifier:1,show_particles:0b}],attributes:[{id:"scale",base:0.5}],Passengers:[{id:"armor_stand",Marker:1b,Invisible:true,equipment:{head:{id:"minecraft:stick",Count:1,components:{custom_model_data:{floats:[8888]}}}}}]}
+
+/summon minecraft:frog ~ ~ ~2 {active_effects:[{id:invisibility,duration:-1,amplifier:1,show_particles:0b}],attributes:[{id:"scale",base:0.75}],Passengers:[{id:"armor_stand",Invisible:true,Marker:true,equipment:{head:{id:"minecraft:stick",Count:1,components:{custom_model_data:{floats:[8888]}}}}}]}
+
+/summon armor_stand ~ ~ ~ {equipment:{head:{id:"minecraft:stick",Count:1,components:{custom_model_data:{floats:[8888]}}}}}
+
+/summon armor_stand ~ ~ ~ {Marker:1b,equipment:{head:{id:"minecraft:stick",Count:1,components:{custom_model_data:{floats:[8888]}}}}}
+
+/summon minecraft:frog ~ ~ ~ {attributes:[{id:"scale",base:0.5}],equipment:{head:{id:"minecraft:stick",Count:1,components:{custom_model_data:{floats:[8888]}}}}
+
+/summon zombie ~ ~ ~ {attributes:[{id:"generic.scale",base:2.0}]}
+
+/give @p shears[minecraft:can_break={blocks:"minecraft:kelp"}]
