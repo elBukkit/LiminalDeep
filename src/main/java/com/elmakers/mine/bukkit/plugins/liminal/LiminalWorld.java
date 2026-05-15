@@ -89,8 +89,14 @@ public class LiminalWorld {
     }
 
     public World getWorld() {
+        return getWorld(false);
+    }
+
+    public World getWorld(boolean reconfigure) {
+        boolean configure = reconfigure;
         if (world == null) {
             world = plugin.getServer().getWorld(name);
+            configure = true;
             if (world == null) {
                 final WorldCreator creator = new WorldCreator(name).generator(generator);
                 if (seed != null) {
@@ -100,11 +106,11 @@ public class LiminalWorld {
                 }
                 world = Bukkit.createWorld(creator);
             }
-            if (world == null) {
-                plugin.getLogger().severe("Unable to create world " + name);
-            } else {
-                configureWorld(world);
-            }
+        }
+        if (world == null) {
+            plugin.getLogger().severe("Unable to create world " + name);
+        } else if (configure) {
+            configureWorld(world);
         }
         return world;
     }
