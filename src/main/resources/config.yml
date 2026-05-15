@@ -219,7 +219,7 @@ worlds:
 
   dark_pools:
     title: "&3The Dark Pools"
-    time: 14000
+    time: 18000
     rain: true
     biome: lush_caves
     rooms:

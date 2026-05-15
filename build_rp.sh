@@ -1,8 +1,7 @@
 #!/bin/bash
 cd "$( dirname "$0" )"
-rm -r target
-mkdir target
 cd target
+rm -r rp
 mkdir rp
 cd rp
 

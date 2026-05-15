@@ -8,14 +8,18 @@ Download the latest release, and put the .jar file in your server's plugins fold
 
 ## Resource Pack Credits
 
-Some textures taken from Pool Rooms by CatFries:
+Pool Rooms Textures by CatFries:
 
 https://www.planetminecraft.com/texture-pack/poolrooms/
 
-No Light, No Color:
+No Light, No Color by SuperAnt_:
 
 https://modrinth.com/resourcepack/no-light-no-color
 
-ReShaded:
+ReShaded by DR7:
 
-https://modrinth.com/resourcepack/re-shaded?version=26.1.1#download
+https://modrinth.com/resourcepack/re-shaded
+
+Wavy Water by AlphaLeoli:
+
+https://www.planetminecraft.com/texture-pack/wavey-water-vanilla-no-optifine-mods-required/
