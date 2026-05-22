@@ -131,7 +131,7 @@ rooms:
     food_probability: 0.1
     underwater_food_probability: 0.2
     food_type: underwater
-    food_block: minecraft:kelp
+    food_block: minecraft:kelp_plant
     flooding_probability: 0.5
     flooding_min_level: 1
     flooding_max_level: 4
@@ -244,4 +244,4 @@ items:
       - Wear to breathe underwater
   kelp_shears:
     name: "&bKelp Shears"
-    item: shears[minecraft:can_break={blocks:"minecraft:kelp"}]
+    item: shears[minecraft:can_break={blocks:["minecraft:kelp_plant","minecraft:kelp"]}]
