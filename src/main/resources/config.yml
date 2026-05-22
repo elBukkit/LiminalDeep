@@ -111,7 +111,7 @@ rooms:
   dark_pools:
     type: pools
     food_location: 7
-    bedrock_level: 20
+    bedrock_level: 18
     sunroof_probability: 0.25
     hallway_min_width_half: 0
     hallway_max_width_half: 3
@@ -135,6 +135,7 @@ rooms:
     flooding_probability: 0.5
     flooding_min_level: 1
     flooding_max_level: 4
+    water_depth_max: 3
     floor_blocks:
       - blue_concrete
       - light_blue_concrete

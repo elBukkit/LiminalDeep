@@ -48,6 +48,7 @@ public class PoolsRoom extends LiminalRoom {
     private double FLOODING_PROBABILITY = 0;
     private int FLOODING_MIN_LEVEL = 1;
     private int FLOODING_MAX_LEVEL = 6;
+    private int WATER_DEPTH_MAX = 1;
     private FoodType foodType = FoodType.VINES;
     private final BlockData foodBlock;
 
@@ -98,6 +99,7 @@ public class PoolsRoom extends LiminalRoom {
         FLOODING_PROBABILITY = config.getDouble("flooding_probability", FLOODING_PROBABILITY);
         FLOODING_MIN_LEVEL = config.getInt("flooding_min_level", FLOODING_MIN_LEVEL);
         FLOODING_MAX_LEVEL = config.getInt("flooding_mx_level", FLOODING_MAX_LEVEL);
+        WATER_DEPTH_MAX =  config.getInt("water_depth_max", WATER_DEPTH_MAX);
         String foodBlockData = config.getString("food_block", "");
         foodBlock = foodBlockData.isEmpty() ? null : world.getPlugin().getServer().createBlockData(foodBlockData);
 
@@ -177,6 +179,8 @@ public class PoolsRoom extends LiminalRoom {
         final int lightsSecond = 16 - lightsFirst;
         final boolean isFlooded = hasSunRoof && random.nextDouble() < FLOODING_PROBABILITY;
         final boolean hasFloorLights = random.nextDouble() < FLOOR_LIGHT_PROBABILITY;
+        final int waterMinY = floorLevel - WATER_DEPTH_MAX;
+        final int lightY = waterMinY;
         Levelled floodWater = null;
         if (isFlooded) {
             int floodLevel = RandomUtils.range(random, FLOODING_MIN_LEVEL, FLOODING_MAX_LEVEL);
@@ -231,9 +235,11 @@ public class PoolsRoom extends LiminalRoom {
                 } else if (isSunRoof) {
                     // Island
                     if (!hasIsland) {
-                        chunk.setBlock(x, floorLevel, z, waterBlock);
+                        for (int y = floorLevel; y > waterMinY; y--) {
+                            chunk.setBlock(x, y, z, waterBlock);
+                        }
                         if (x == 8 && z == 8) {
-                            chunk.setBlock(x, floorLevel - 1, z, lightMaterial);
+                            chunk.setBlock(x, lightY, z, lightMaterial);
                         }
                     } else {
                         chunk.setBlock(x, floorLevel, z, floorBlock);
@@ -243,9 +249,11 @@ public class PoolsRoom extends LiminalRoom {
                     chunk.setBlock(x, roofLevel, z, ceilingBlock);
                     final boolean isCenterLight = (x == lightsFirst || x == lightsSecond) && (z == lightsFirst || z == lightsSecond);
                     if (hasPools) {
-                        chunk.setBlock(x, floorLevel, z, waterBlock);
+                        for (int y = floorLevel; y > waterMinY; y--) {
+                            chunk.setBlock(x, y, z, waterBlock);
+                        }
                         if (isCenterLight) {
-                            chunk.setBlock(x, floorLevel - 1, z, lightMaterial);
+                            chunk.setBlock(x, lightY, z, lightMaterial);
                         }
                     } else if (hasFloorLights && isCenterLight) {
                         chunk.setBlock(x, floorLevel, z, lightMaterial);
@@ -322,7 +330,7 @@ public class PoolsRoom extends LiminalRoom {
                         hallwayRight = Math.max(hallwayRight, 10);
                     }
                     if (x < hallwayLeft || x > hallwayRight || z < hallwayLeft || z > hallwayRight) {
-                        for (int y = floorLevel; y <= roofLevel; y++) {
+                        for (int y = waterMinY; y <= roofLevel; y++) {
                             chunk.setBlock(x, y, z, wallBlock);
                         }
                     }
