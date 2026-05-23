@@ -131,6 +131,19 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
         return materials;
     }
 
+    public CustomSound[] getSounds(ConfigurationSection config, String key, CustomSound[] defaults) {
+        List<String> soundNames = config.getStringList(key);
+        if (soundNames == null || soundNames.isEmpty()) {
+            return defaults;
+        }
+        CustomSound[] sounds = new CustomSound[soundNames.size()];
+        for (int i = 0; i < soundNames.size(); i++) {
+            String soundName = soundNames.get(i);
+            sounds[i] = CustomSound.fromString(soundName);
+        }
+        return sounds;
+    }
+
     public void checkNewChunk(Chunk chunk) {
         LiminalWorld liminalWorld = getWorld(chunk.getWorld().getName());
         if (liminalWorld != null) {

@@ -211,6 +211,8 @@ rooms:
 worlds:
 
   pools:
+    min_ambient_sound_time: 60
+    max_ambient_sound_time: 600
     title_delay: 2000
     title: "&bThe Shallow Pools"
     time: 6000
@@ -220,6 +222,8 @@ worlds:
       - pools_exit
 
   dark_pools:
+    min_ambient_sound_time: 30
+    max_ambient_sound_time: 180
     title: "&3The Dark Pools"
     time: 18000
     rain: true
@@ -231,6 +235,8 @@ worlds:
       - dark_pools_vault
 
   ocean:
+    min_ambient_sound_time: 10
+    max_ambient_sound_time: 30
     title: "&8The Abyss"
     biome: deep_ocean
     time: 18000

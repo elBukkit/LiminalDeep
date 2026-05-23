@@ -1,6 +1,7 @@
 package com.elmakers.mine.bukkit.plugins.liminal;
 
 import java.util.Locale;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
@@ -20,6 +22,7 @@ import com.elmakers.mine.bukkit.plugins.liminal.populator.DeepPoolPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.WaterfallPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LootPopulator;
+import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.OceanRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.PoolsRoom;
@@ -32,8 +35,23 @@ public class LiminalWorld {
     protected final boolean rain;
     protected final String title;
     protected final int titleDelay;
+    private final int minAmbientSoundTime;
+    private final int maxAmbientSoundTime;
+    private final Random random = new Random();
     protected Long seed;
     private World world;
+
+    private CustomSound[] ambientSounds = {
+        CustomSound.of(Sound.AMBIENT_BASALT_DELTAS_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_CAVE),
+        CustomSound.of(Sound.AMBIENT_CRIMSON_FOREST_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_NETHER_WASTES_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_SOUL_SAND_VALLEY_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_WARPED_FOREST_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_UNDERWATER_LOOP_ADDITIONS),
+        CustomSound.of(Sound.AMBIENT_UNDERWATER_LOOP_ADDITIONS_RARE),
+        CustomSound.of(Sound.AMBIENT_UNDERWATER_LOOP_ADDITIONS_ULTRA_RARE)
+    };
 
     public LiminalWorld(LiminalWorldPlugin plugin, String name, ConfigurationSection generalConfig, ConfigurationSection config) {
         this.plugin = plugin;
@@ -42,10 +60,14 @@ public class LiminalWorld {
         title = config.getString("title");
         titleDelay = config.getInt("title_delay", generalConfig.getInt("title_delay", 0));
         rain = config.getBoolean("rain");
+        minAmbientSoundTime = config.getInt("min_ambient_sound_time", 0) * 20;
+        maxAmbientSoundTime = config.getInt("max_ambient_sound_time", 0) * 20;
         if (config.contains("seed")) {
             seed = config.getLong("seed");
         }
         generator = new LiminalGenerator(this, config);
+        ambientSounds = plugin.getSounds(config, "ambient_sounds", ambientSounds);
+        scheduleAmbientSounds();
     }
 
     public String getNextLevel(Location location) {
@@ -203,5 +225,21 @@ public class LiminalWorld {
                 plugin.getLogger().severe("Unknown populator type: " + roomType);
                 return null;
         }
+    }
+
+    private void scheduleAmbientSounds() {
+        if (minAmbientSoundTime == 0 || maxAmbientSoundTime == 0) {
+            return;
+        }
+
+        final int soundTime = RandomUtils.range(random, minAmbientSoundTime, maxAmbientSoundTime);
+        plugin.getServer().getScheduler().runTaskLater(
+            plugin,
+            () -> {
+                final CustomSound sound = ambientSounds[random.nextInt(ambientSounds.length)];
+                sound.play(getWorld());
+                scheduleAmbientSounds();
+            },
+            soundTime);
     }
 }
