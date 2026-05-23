@@ -16,4 +16,8 @@ public class RandomUtils {
         }
         return min + random.nextInt(max - min);
     }
+
+    public static double lerp(int value, int min, int max) {
+        return Math.min(1.0, Math.max(0.0, (double)value / (double)(max - min)));
+    }
 }

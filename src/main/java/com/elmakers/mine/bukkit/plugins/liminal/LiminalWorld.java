@@ -16,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.populator.DeepPoolPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.WaterfallPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LootPopulator;
@@ -194,6 +195,8 @@ public class LiminalWorld {
         switch (roomType) {
             case "waterfall":
                 return new WaterfallPopulator(room, config);
+            case "deep_pool":
+                return new DeepPoolPopulator(room, config);
             case "loot":
                 return new LootPopulator(room, config);
             default:

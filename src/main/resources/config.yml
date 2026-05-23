@@ -62,10 +62,9 @@ populators:
           - coal
 
   dark_pools_exit:
-    type: waterfall
+    type: deep_pool
     next_level: ocean
-    command_blocks: true
-    exit_level: -32
+    exit_level: -60
 
 rooms:
 
@@ -111,11 +110,11 @@ rooms:
   dark_pools:
     type: pools
     food_location: 7
-    bedrock_level: 18
+    bedrock_level: 200
+    floor_level: 204
     sunroof_probability: 0.25
     hallway_min_width_half: 0
     hallway_max_width_half: 3
-    floor_level: 22
     roof_min_height: 3
     roof_max_height: 6
     doorway_min_height: 2
@@ -154,6 +153,7 @@ rooms:
     inherit: dark_pools
     min_distance: 640
     max_distance: 3200
+    sunroof_probability: 1
     weight: 0.2
     populators:
       - dark_pools_exit
