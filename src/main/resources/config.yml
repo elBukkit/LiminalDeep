@@ -2,6 +2,7 @@ general:
   version: 1
   title_delay: 8000
   default_world: pools
+  resource_pack: "https://rp.elmakers.com/LiminalDeep-RP-1.0.zip"
 
 populators:
 

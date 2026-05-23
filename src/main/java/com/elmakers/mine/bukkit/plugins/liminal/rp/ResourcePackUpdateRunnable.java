@@ -1,0 +1,123 @@
+package com.elmakers.mine.bukkit.plugins.liminal.rp;
+
+import java.io.BufferedInputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
+
+import com.google.common.io.BaseEncoding;
+
+public class ResourcePackUpdateRunnable implements Runnable {
+    private final ResourcePackManager manager;
+    private final ResourcePackResponse callback;
+    private final ResourcePack resourcePack;
+
+    public ResourcePackUpdateRunnable(ResourcePackManager manager, ResourcePack resourcePack, ResourcePackResponse callback) {
+        this.manager = manager;
+        this.resourcePack = resourcePack;
+        this.callback = callback;
+    }
+
+    @Override
+    public void run() {
+        boolean success = true;
+        boolean hasModifiedTime = false;
+        final Plugin plugin = manager.getPlugin();
+        final Server server = plugin.getServer();
+        final boolean initialLoad = !resourcePack.isChecked();
+        resourcePack.setChecked(true);
+        final String finalResourcePack = resourcePack.getUrl();
+        final long modifiedTimestamp = resourcePack.getModified().getTime();
+        byte[] resourcePackHash = resourcePack.getHash();
+        String currentHashString = resourcePack.getHashString();
+        final List<String> responses = new ArrayList<>();
+        try {
+            URL rpURL = new URL(finalResourcePack);
+            HttpURLConnection connection = (HttpURLConnection)rpURL.openConnection();
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestMethod("HEAD");
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
+            {
+                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+                Date tryParseDate = new Date(1L);
+                final String lastModified = connection.getHeaderField("Last-Modified");
+                if (lastModified == null || lastModified.isEmpty()) {
+                    responses.add(ChatColor.YELLOW + "Server did not return a Last-Modified field");
+                } else {
+                    try {
+                        tryParseDate = format.parse(lastModified);
+                        hasModifiedTime = true;
+                    } catch (ParseException dateFormat) {
+                        success = false;
+                        responses.add("Error parsing resource pack modified time: " + lastModified);
+                    }
+                }
+                final Date modifiedDate = tryParseDate;
+                if (modifiedDate.getTime() > modifiedTimestamp || resourcePackHash == null) {
+                    final boolean isUnset = (resourcePackHash == null);
+                    if (modifiedTimestamp <= 0) {
+                        responses.add(ChatColor.YELLOW + "Checking resource pack for the first time");
+                    } else if (isUnset) {
+                        responses.add(ChatColor.YELLOW + "Resource pack hash format changed, downloading for one-time update");
+                    } else {
+                        responses.add(ChatColor.YELLOW + "Resource pack modified, redownloading (" + modifiedDate.getTime() + " > " + modifiedTimestamp + ")");
+                    }
+
+                    MessageDigest digest = MessageDigest.getInstance("SHA1");
+                    try (BufferedInputStream in = new BufferedInputStream(rpURL.openStream())) {
+                        final byte[] data = new byte[1024];
+                        int count;
+                        while ((count = in.read(data, 0, 1024)) != -1) {
+                            digest.update(data, 0, count);
+                        }
+                    }
+                    resourcePackHash = digest.digest();
+                    String newSourcePackHashString = BaseEncoding.base64().encode(resourcePackHash);
+
+                    if (initialLoad) {
+                        responses.add(ChatColor.GREEN + "Resource pack hash set to " + ChatColor.GRAY + newSourcePackHashString);
+                    } else if (currentHashString != null && currentHashString.equals(newSourcePackHashString))  {
+                        responses.add(ChatColor.GREEN + "Resource pack hash has not changed");
+                    } else {
+                        responses.add(ChatColor.YELLOW + "Resource pack hash changed, use " + ChatColor.AQUA + "/magic rpsend" + ChatColor.YELLOW + " to update connected players");
+                    }
+
+                    resourcePack.update(resourcePackHash, modifiedDate);
+                    manager.saveResourcePacks();
+                } else {
+                    responses.add(ChatColor.GREEN + "Resource pack has not changed, using hash " + currentHashString +  " (" + modifiedDate.getTime() + " <= " + modifiedTimestamp + ")");
+                }
+            } else {
+                responses.add(ChatColor.RED + "Could not find resource pack at: " + ChatColor.DARK_RED + finalResourcePack);
+                success = false;
+            }
+        }
+        catch (Exception ex) {
+            success = false;
+            responses.add("An unexpected error occurred while checking your resource pack (see logs): " + ChatColor.DARK_RED + finalResourcePack);
+            plugin.getLogger().log(Level.WARNING,"Error checking resource pack: " + ex.getClass().getSimpleName() + " : " + ex.getMessage());
+        }
+
+        if (plugin.isEnabled() && callback != null) {
+            final boolean finalSuccess = success;
+            final boolean finalHasModified = hasModifiedTime;
+            server.getScheduler().runTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    callback.finished(finalSuccess, finalHasModified, responses, resourcePack);
+                }
+            });
+        }
+    }
+}

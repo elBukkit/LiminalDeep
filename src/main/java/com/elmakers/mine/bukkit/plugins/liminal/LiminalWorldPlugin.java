@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.ChunkListener;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.PlayerListener;
+import com.elmakers.mine.bukkit.plugins.liminal.rp.ResourcePackManager;
 
 public class LiminalWorldPlugin extends JavaPlugin implements Listener {
     private static int CURRENT_VERSION = 1;
@@ -32,6 +33,7 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
     private ChunkListener chunkListener;
     private String defaultWorld;
     private ItemGenerator itemGenerator;
+    private ResourcePackManager resourcePacks = null;
 
     @Override
     public void onEnable() {
@@ -78,6 +80,9 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
                 getWorld(worldName).getWorld();
             }
         }, 1L);
+        resourcePacks = new ResourcePackManager(this);
+        resourcePacks.load(generalConfig);
+        pm.registerEvents(resourcePacks, this);
     }
 
     @Override
