@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -83,6 +84,10 @@ public class LiminalWorldPlugin extends JavaPlugin implements Listener {
         resourcePacks = new ResourcePackManager(this);
         resourcePacks.load(generalConfig);
         pm.registerEvents(resourcePacks, this);
+
+        // Remove all crafting recipes
+        Bukkit.clearRecipes();
+        
     }
 
     @Override
