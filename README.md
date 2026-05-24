@@ -2,6 +2,24 @@
 
 A pool-based liminal horror Bukkit mod for Minecraft. Find out what lurks beneath...
 
+## WARNING
+
+This plugin completely changes your server's behavior!
+
+It is **strongly** recommended to test this out in a clean server.
+
+This plugin may not really play well with other plugins, it is meant to be a unique and
+self-contained experience mimicking a Liminal client mod.
+
+It will, among other things:
+
+ - Create new worlds
+ - Force players into adventure mode
+ - Send a resource pack to players
+ - Move existing players to a new starting world
+ - Respawn players in a new world
+ - Change mob spawning behaviors
+
 ## Installation Instructions
 
 Download the latest release, and put the .jar file in your server's plugins folder.
