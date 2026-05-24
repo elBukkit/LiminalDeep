@@ -10,13 +10,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 public class ItemGenerator {
-    private final LiminalController plugin;
+    private final LiminalController controller;
     private final Map<String, ItemStack> items = new HashMap<>();
 
-    public ItemGenerator(LiminalController plugin, ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
-        this.plugin = plugin;
+    public ItemGenerator(LiminalController controller, ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
+        this.controller = controller;
+        final Plugin plugin = controller.getPlugin();
         for (String itemKey : itemConfigs.getKeys(false)) {
             ConfigurationSection itemConfig = itemConfigs.getConfigurationSection(itemKey);
             String itemData = itemConfig.getString("item");

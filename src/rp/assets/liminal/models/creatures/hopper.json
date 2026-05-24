@@ -7,7 +7,7 @@
 	},
 	"display": {
 		"head": {
-			"translation": [ 0, -30, 0 ],
+			"translation": [ 0, 6.5, 0 ],
 			"scale": [2, 2, 2]
 		}
 	},

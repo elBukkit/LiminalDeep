@@ -20,6 +20,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.elmakers.mine.bukkit.plugins.liminal.entities.EntityGenerator;
+import com.elmakers.mine.bukkit.plugins.liminal.entities.LiminalEntity;
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.ChunkListener;
 import com.elmakers.mine.bukkit.plugins.liminal.listener.PlayerListener;
@@ -35,6 +37,7 @@ public class LiminalController implements Listener {
     private final ChunkListener chunkListener;
     private final String defaultWorld;
     private final ItemGenerator itemGenerator;
+    private final EntityGenerator entityGenerator;
     private final ResourcePackManager resourcePacks;
 
     public LiminalController(JavaPlugin plugin, ConfigurationSection configuration) {
@@ -42,6 +45,14 @@ public class LiminalController implements Listener {
         PluginManager pm = getServer().getPluginManager();
         ConfigurationSection generalConfig = configuration.getConfigurationSection("general");
         defaultWorld = generalConfig.getString("default_world");
+
+        // Load items
+        ConfigurationSection itemConfigs = configuration.getConfigurationSection("items");
+        itemGenerator = new ItemGenerator(this, generalConfig, itemConfigs);
+
+        // Load Entities
+        ConfigurationSection entityConfigs = configuration.getConfigurationSection("entities");
+        entityGenerator = new EntityGenerator(this, generalConfig, entityConfigs);
 
         // Load Populators
         ConfigurationSection populatorConfigs = configuration.getConfigurationSection("populators");
@@ -62,14 +73,12 @@ public class LiminalController implements Listener {
             worlds.put(key, world);
         }
 
-        ConfigurationSection itemConfigs = configuration.getConfigurationSection("items");
-        itemGenerator = new ItemGenerator(this, generalConfig, itemConfigs);
-
         commandExecutor = new LiminalCommandExecutor(this);
         playerListener = new PlayerListener(this);
         pm.registerEvents(playerListener, getPlugin());
         chunkListener = new ChunkListener(this);
         pm.registerEvents(chunkListener, getPlugin());
+        pm.registerEvents(entityGenerator, getPlugin());
         getServer().getScheduler().runTaskLater(getPlugin(), () -> {
             for (String worldName : worlds.keySet()) {
                 getWorld(worldName).getWorld();
@@ -236,6 +245,10 @@ public class LiminalController implements Listener {
             return templateConfig;
         }
         return config;
+    }
+
+    public LiminalEntity getEntity(ConfigurationSection config) {
+        return entityGenerator.getEntity(config);
     }
 
     public JavaPlugin getPlugin() {

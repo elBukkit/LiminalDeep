@@ -4,6 +4,24 @@ general:
   default_world: pools
   resource_pack: "https://rp.elmakers.com/LiminalDeep-RP-1.0.zip"
 
+items:
+  diving_helmet:
+    name: "&bDiving Helmet"
+    item: chainmail_helmet[attribute_modifiers=[{id:"oxygen",type:"oxygen_bonus",amount:1000000,operation:"add_value",slot:"head",display:{type:"hidden"}}],tooltip_display={hidden_components:["attribute_modifiers"]}]
+    lore:
+      - Wear to breathe underwater
+  kelp_shears:
+    name: "&bKelp Shears"
+    item: shears[minecraft:can_break={blocks:["minecraft:kelp_plant","minecraft:kelp"]}]
+  hopper_helmet:
+    name: "&0Hopper"
+    item: stick[custom_model_data={floats:[8888]}]
+
+entities:
+  hopper:
+    type: rabbit
+    item: hopper_helmet
+
 populators:
 
   pools_exit:
@@ -99,6 +117,11 @@ rooms:
       - quartz_block
     light_blocks:
       - sea_lantern
+    entity_probability: 0.05
+    entities:
+      hopper:
+        type: hopper
+        weight: 1
 
   pools_exit:
     min_distance: 640
@@ -243,12 +266,3 @@ worlds:
     rooms:
       - ocean
 
-items:
-  diving_helmet:
-    name: "&bDiving Helmet"
-    item: chainmail_helmet[attribute_modifiers=[{id:"oxygen",type:"oxygen_bonus",amount:1000000,operation:"add_value",slot:"head",display:{type:"hidden"}}],tooltip_display={hidden_components:["attribute_modifiers"]}]
-    lore:
-      - Wear to breathe underwater
-  kelp_shears:
-    name: "&bKelp Shears"
-    item: shears[minecraft:can_break={blocks:["minecraft:kelp_plant","minecraft:kelp"]}]
