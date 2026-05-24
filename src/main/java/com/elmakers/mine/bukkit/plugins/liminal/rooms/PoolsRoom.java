@@ -48,6 +48,8 @@ public class PoolsRoom extends LiminalRoom {
     private double FLOODING_PROBABILITY = 0;
     private int FLOODING_MIN_LEVEL = 1;
     private int FLOODING_MAX_LEVEL = 6;
+    private int WATER_HEIGHT_MAX = 0;
+    private int WATER_HEIGHT_MIN = 0;
     private int WATER_DEPTH_MAX = 1;
     private FoodType foodType = FoodType.VINES;
     private final BlockData foodBlock;
@@ -100,6 +102,8 @@ public class PoolsRoom extends LiminalRoom {
         FLOODING_MIN_LEVEL = config.getInt("flooding_min_level", FLOODING_MIN_LEVEL);
         FLOODING_MAX_LEVEL = config.getInt("flooding_mx_level", FLOODING_MAX_LEVEL);
         WATER_DEPTH_MAX =  config.getInt("water_depth_max", WATER_DEPTH_MAX);
+        WATER_HEIGHT_MAX = config.getInt("water_height_max", WATER_HEIGHT_MAX);
+        WATER_HEIGHT_MIN = config.getInt("water_height_min", WATER_HEIGHT_MIN);
         String foodBlockData = config.getString("food_block", "");
         foodBlock = foodBlockData.isEmpty() ? null : world.getPlugin().getServer().createBlockData(foodBlockData);
 
@@ -142,6 +146,7 @@ public class PoolsRoom extends LiminalRoom {
         final int roofMaxLevel = floorLevel + ROOF_MAX_HEIGHT;
         final int doorwayLevel = Math.min(roofLevel, floorLevel + RandomUtils.range(random, DOORWAY_MIN_HEIGHT, DOORWAY_MAX_HEIGHT));
         final int doorwayWidthHalf = RandomUtils.range(random, DOORWAY_MIN_WIDTH_HALF, DOORWAY_MAX_WIDTH_HALF);
+        final int waterHeight = RandomUtils.range(random, WATER_HEIGHT_MIN, WATER_HEIGHT_MAX);
         final int doorwayLeft = 7 - doorwayWidthHalf;
         final int doorwayRight = 9 + doorwayWidthHalf;
         final int walkwayWidthHalf = isStartingChunk ? 0 : random.nextInt(WALKWAY_MAX_WIDTH_HALF);
@@ -229,7 +234,13 @@ public class PoolsRoom extends LiminalRoom {
                         chunk.setBlock(x, roofLevel, z, ceilingBlock);
                     }
                     chunk.setBlock(x, floorLevel, z, floorBlock);
-                    if (floodWater != null) {
+                    if (waterHeight > 0) {
+                        final int maxWaterHeight = Math.min(floorLevel + waterHeight, roofLevel);
+                        for (int y = floorLevel + 1; y < maxWaterHeight; y++) {
+                            final BlockData waterData = floodWater != null && y == maxWaterHeight - 1 ? floodWater : waterBlock;
+                            chunk.setBlock(x, y, z, waterData);
+                        }
+                    } else if (floodWater != null) {
                         chunk.setBlock(x, floorLevel + 1, z, floodWater);
                     }
                 } else if (isSunRoof) {

@@ -7,9 +7,14 @@ general:
 items:
   diving_helmet:
     name: "&bDiving Helmet"
-    item: chainmail_helmet[attribute_modifiers=[{id:"oxygen",type:"oxygen_bonus",amount:1000000,operation:"add_value",slot:"head",display:{type:"hidden"}}],tooltip_display={hidden_components:["attribute_modifiers"]}]
+    item: chainmail_helmet[attribute_modifiers=[{id:"oxygen",type:"oxygen_bonus",amount:10,operation:"add_value",slot:"head",display:{type:"hidden"}}],tooltip_display={hidden_components:["attribute_modifiers"]}]
     lore:
-      - Wear to breathe underwater
+      - Wear to breathe underwater for a little longer
+  diving_suit:
+    name: "&bDiving Suit"
+    item: chainmail_chestplate[attribute_modifiers=[{id:"oxygen",type:"oxygen_bonus",amount:100000000,operation:"add_value",slot:"head",display:{type:"hidden"}}],tooltip_display={hidden_components:["attribute_modifiers"]}]
+    lore:
+      - Wear to breathe underwater for an unlimited amount of time
   kelp_shears:
     name: "&bKelp Shears"
     item: shears[minecraft:can_break={blocks:["minecraft:kelp_plant","minecraft:kelp"]}]
@@ -82,6 +87,26 @@ populators:
           - coal
 
   dark_pools_exit:
+    type: deep_pool
+    next_level: flooded_pools
+    exit_level: -60
+
+  flooded_pools_loot:
+    type: loot
+    drops:
+      diving_suit:
+        block: barrel
+        weight: 0.1
+        items:
+          - diving_suit
+      smoker:
+        block: smoker
+        weight: 1
+        items:
+          - air
+          - coal
+
+  flooded_pools_exit:
     type: deep_pool
     next_level: ocean
     exit_level: -60
@@ -226,6 +251,67 @@ rooms:
     light_blocks:
       - glowstone
 
+  flooded_pools:
+    type: pools
+    food_location: 7
+    bedrock_level: 200
+    floor_level: 216
+    sunroof_probability: 0
+    hallway_min_width_half: 2
+    hallway_max_width_half: 7
+    roof_min_height: 5
+    roof_max_height: 8
+    doorway_min_height: 3
+    doorway_max_height: 6
+    doorway_max_width_half: 3
+    walkway_max_width_half: 7
+    light_probability: 0.1
+    wall_probability: 0.25
+    window_probability: 0
+    island_probability: 0.2
+    pool_probability: 0.8
+    double_door_probability: 0.5
+    food_probability: 0.1
+    underwater_food_probability: 0.2
+    food_type: underwater
+    food_block: minecraft:kelp_plant
+    flooding_probability: 0.5
+    flooding_min_level: 1
+    flooding_max_level: 4
+    water_height_min: 6
+    water_height_max: 12
+    water_depth_max: 12
+    floor_blocks:
+      - blue_concrete
+      - light_blue_concrete
+    wall_blacks:
+      - polished_diorite
+      - diorite
+      - quartz_block
+    ceiling_blacks:
+      - polished_diorite
+      - diorite
+      - quartz_block
+    light_blocks:
+      - sea_lantern
+
+  flooded_pools_exit:
+    inherit: flooded_pools
+    min_distance: 640
+    max_distance: 3200
+    sunroof_probability: 1
+    weight: 0.2
+    populators:
+      - flooded_pools_exit
+
+  flooded_pools_loot:
+    inherit: flooded_pools
+    min_distance: 256
+    max_distance: 1024
+    weight: 0.05
+    populators:
+      - flooded_pools_loot
+
   ocean:
     type: ocean
     sea_level: 190
@@ -248,7 +334,7 @@ worlds:
   dark_pools:
     min_ambient_sound_time: 30
     max_ambient_sound_time: 180
-    title: "&3The Dark Pools"
+    title: "&9The Dark Pools"
     time: 18000
     rain: true
     biome: lush_caves
@@ -257,6 +343,17 @@ worlds:
       - dark_pools_exit
       - dark_pools_loot
       - dark_pools_vault
+
+  flooded_pools:
+    min_ambient_sound_time: 15
+    max_ambient_sound_time: 60
+    title: "&1The Flooded Pools"
+    time: 18000
+    biome: lush_caves
+    rooms:
+      - flooded_pools
+      - flooded_pools_exit
+      - flooded_pools_loot
 
   ocean:
     min_ambient_sound_time: 10
