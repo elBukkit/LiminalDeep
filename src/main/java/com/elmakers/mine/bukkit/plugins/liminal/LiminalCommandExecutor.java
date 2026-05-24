@@ -26,11 +26,20 @@ public class LiminalCommandExecutor implements TabExecutor {
 
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
+        if (args.length < 1) {
+            return false;
+        }
+        String subCommand = args[0];
+        switch (subCommand) {
+            case "reload":
+                processReloadCommand(sender);
+                return true;
+        }
+
         if (args.length < 2) {
             return false;
         }
 
-        String subCommand = args[0];
         switch (subCommand) {
             case "go":
                 processGoCommand(sender, args[1]);
@@ -70,6 +79,10 @@ public class LiminalCommandExecutor implements TabExecutor {
         player.getInventory().addItem(item);
     }
 
+    private void processReloadCommand(CommandSender sender) {
+        controller.reload(sender);
+    }
+
     private boolean checkPlayer(CommandSender sender) {
         if (sender instanceof Player) {
             return true;
@@ -82,7 +95,7 @@ public class LiminalCommandExecutor implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
         if (args.length == 1) {
-            return List.of("go", "give");
+            return List.of("go", "give", "reload");
         }
         if (args.length == 2) {
             switch (args[0]) {

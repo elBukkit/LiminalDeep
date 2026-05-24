@@ -16,8 +16,15 @@ public class ItemGenerator {
     private final LiminalController controller;
     private final Map<String, ItemStack> items = new HashMap<>();
 
-    public ItemGenerator(LiminalController controller, ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
+    public ItemGenerator(LiminalController controller) {
         this.controller = controller;
+    }
+
+    public void reset() {
+        items.clear();
+    }
+
+    public void load(ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
         final Plugin plugin = controller.getPlugin();
         for (String itemKey : itemConfigs.getKeys(false)) {
             ConfigurationSection itemConfig = itemConfigs.getConfigurationSection(itemKey);

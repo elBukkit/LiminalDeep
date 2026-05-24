@@ -12,6 +12,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
@@ -48,11 +49,13 @@ public class LiminalController implements Listener {
 
         // Load items
         ConfigurationSection itemConfigs = configuration.getConfigurationSection("items");
-        itemGenerator = new ItemGenerator(this, generalConfig, itemConfigs);
+        itemGenerator = new ItemGenerator(this);
+        itemGenerator.load(generalConfig, itemConfigs);
 
         // Load Entities
         ConfigurationSection entityConfigs = configuration.getConfigurationSection("entities");
-        entityGenerator = new EntityGenerator(this, generalConfig, entityConfigs);
+        entityGenerator = new EntityGenerator(this);
+        entityGenerator.load(generalConfig, entityConfigs);
 
         // Load Populators
         ConfigurationSection populatorConfigs = configuration.getConfigurationSection("populators");
@@ -90,6 +93,20 @@ public class LiminalController implements Listener {
 
         // Remove all crafting recipes
         Bukkit.clearRecipes();
+    }
+
+    public void reload(CommandSender sender) {
+        plugin.reloadConfig();
+        ConfigurationSection configuration = plugin.getConfig();
+        ConfigurationSection generalConfig = configuration.getConfigurationSection("general");
+        ConfigurationSection itemConfigs = configuration.getConfigurationSection("items");
+        ConfigurationSection entityConfigs = configuration.getConfigurationSection("entities");
+        itemGenerator.reset();
+        itemGenerator.load(generalConfig, itemConfigs);
+        entityGenerator.reset();
+        entityGenerator.load(generalConfig, entityConfigs);
+
+        sender.sendMessage("Reloaded item and entity configurations");
     }
 
     public Location getSpawnLocation(String worldName) {

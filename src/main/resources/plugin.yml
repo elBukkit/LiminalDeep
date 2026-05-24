@@ -13,3 +13,4 @@ commands:
     usage: |
       /liminal go <pools|ocean>        Go to a specific liminal area
       /liminal give <player> <item>    Give a liminal item to a player
+      /liminal reload                  Reload some configs

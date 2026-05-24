@@ -22,7 +22,7 @@ public class EntityGenerator implements Listener {
     private final LiminalController controller;
     private final Map<String, LiminalEntity> entities = new HashMap<>();
 
-    public EntityGenerator(LiminalController controller, ConfigurationSection generalConfig, ConfigurationSection entityConfigs) {
+    public EntityGenerator(LiminalController controller) {
         this.controller = controller;
         for (String key : entityConfigs.getKeys(false)) {
             LiminalEntity entity = new LiminalEntity(controller, entityConfigs.getConfigurationSection(key));
@@ -32,6 +32,19 @@ public class EntityGenerator implements Listener {
         }
         final Plugin plugin = controller.getPlugin();
         plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this::checkEntities, 0, 4);
+    }
+
+    public void reset() {
+        entities.clear();
+    }
+
+    public void load(ConfigurationSection generalConfig, ConfigurationSection entityConfigs) {
+        for (String key : entityConfigs.getKeys(false)) {
+            LiminalEntity entity = new LiminalEntity(this, key, entityConfigs.getConfigurationSection(key));
+            if (entity.isValid()) {
+                this.entities.put(key, entity);
+            }
+        }
     }
 
     public void checkEntities() {
