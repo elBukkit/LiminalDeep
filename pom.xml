@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.elmakers.mine.bukkit.plugins</groupId>
     <artifactId>liminal</artifactId>
-    <version>1.0</version>
+    <version>0.1</version>
     <name>Minecraft-Liminal-Deep</name>
 
     <licenses>
