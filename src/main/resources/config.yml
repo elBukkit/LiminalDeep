@@ -21,6 +21,7 @@ entities:
   hopper:
     type: rabbit
     item: hopper_helmet
+    rotation_speed: 8
 
 populators:
 
