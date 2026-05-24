@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
 
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
@@ -27,27 +27,27 @@ public class DeepPoolPopulator extends LiminalPopulator {
     public DeepPoolPopulator(LiminalRoom room, ConfigurationSection config) {
         super(room);
 
-        final LiminalWorldPlugin plugin = getPlugin();
+        final LiminalController controller = getController();
         EXIT_LEVEL = config.getInt("exit_level", EXIT_LEVEL);
         nextLevel = config.getString("next_level");
-        LIGHT_BLOCKS = plugin.getMaterials(config, "light_blocks", LIGHT_BLOCKS);
-        WALL_BLOCKS = plugin.getMaterials(config, "wall_blocks", WALL_BLOCKS);
+        LIGHT_BLOCKS = controller.getMaterials(config, "light_blocks", LIGHT_BLOCKS);
+        WALL_BLOCKS = controller.getMaterials(config, "wall_blocks", WALL_BLOCKS);
     }
 
     @Override
     public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion region) {
-        final LiminalWorldPlugin plugin = getPlugin();
+        final LiminalController controller = getController();
         final int chunkGlobalX = chunkX << 4;
         final int chunkGlobalZ = chunkZ << 4;
         final int floorLevel = room.getFloorLevel();
 
         final Material lightBlock = LIGHT_BLOCKS[random.nextInt(LIGHT_BLOCKS.length)];
         final Material wallBlock = WALL_BLOCKS[random.nextInt(WALL_BLOCKS.length)];
-        BlockData lightData = plugin.getServer().createBlockData(lightBlock);
-        BlockData portalData = plugin.getServer().createBlockData(Material.END_PORTAL);
-        BlockData waterData = plugin.getServer().createBlockData(Material.WATER);
-        BlockData quartzData = plugin.getServer().createBlockData(Material.QUARTZ_BLOCK);
-        BlockData wallData = plugin.getServer().createBlockData(wallBlock);
+        BlockData lightData = controller.getServer().createBlockData(lightBlock);
+        BlockData portalData = controller.getServer().createBlockData(Material.END_PORTAL);
+        BlockData waterData = controller.getServer().createBlockData(Material.WATER);
+        BlockData quartzData = controller.getServer().createBlockData(Material.QUARTZ_BLOCK);
+        BlockData wallData = controller.getServer().createBlockData(wallBlock);
 
         for (int relativeX = 5; relativeX <= 11; relativeX++) {
             for (int relativeZ = 5; relativeZ <= 11; relativeZ++) {

@@ -2,9 +2,10 @@ package com.elmakers.mine.bukkit.plugins.liminal.populator;
 
 import org.bukkit.Chunk;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.plugin.Plugin;
 
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
 public class LiminalPopulator extends BlockPopulator {
@@ -25,7 +26,11 @@ public class LiminalPopulator extends BlockPopulator {
         return room.getWorld();
     }
 
-    public LiminalWorldPlugin getPlugin() {
+    public Plugin getPlugin() {
         return getWorld().getPlugin();
+    }
+
+    public LiminalController getController() {
+        return getWorld().getController();
     }
 }

@@ -12,10 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemGenerator {
-    private final LiminalWorldPlugin plugin;
+    private final LiminalController plugin;
     private final Map<String, ItemStack> items = new HashMap<>();
 
-    public ItemGenerator(LiminalWorldPlugin plugin, ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
+    public ItemGenerator(LiminalController plugin, ConfigurationSection generalConfig, ConfigurationSection itemConfigs) {
         this.plugin = plugin;
         for (String itemKey : itemConfigs.getKeys(false)) {
             ConfigurationSection itemConfig = itemConfigs.getConfigurationSection(itemKey);

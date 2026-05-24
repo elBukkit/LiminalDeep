@@ -16,7 +16,7 @@ import org.bukkit.generator.WorldInfo;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.LootDrop;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.LootTable;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
@@ -45,7 +45,7 @@ public class LootPopulator extends LiminalPopulator {
 
     @Override
     public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion region) {
-        final LiminalWorldPlugin plugin = getPlugin();
+        final LiminalController controller = getController();
         final LootDrop drop = lootTable.get(random);
 
         final int chunkGlobalX = chunkX << 4;
@@ -121,7 +121,7 @@ public class LootPopulator extends LiminalPopulator {
         }
         if (inventory != null && !items.isEmpty()) {
             for (int slot = 0; slot < items.size(); slot++) {
-                ItemStack itemStack = plugin.createItem(items.get(slot));
+                ItemStack itemStack = controller.createItem(items.get(slot));
                 if (itemStack == null) {
                     itemStack = new ItemStack(Material.AIR);
                 }

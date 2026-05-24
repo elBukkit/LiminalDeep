@@ -11,11 +11,11 @@ import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalRoomPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.RoomTable;
 
@@ -63,7 +63,7 @@ public class LiminalGenerator extends ChunkGenerator {
         return world;
     }
 
-    public LiminalWorldPlugin getPlugin() {
+    public Plugin getPlugin() {
         return world.getPlugin();
     }
 

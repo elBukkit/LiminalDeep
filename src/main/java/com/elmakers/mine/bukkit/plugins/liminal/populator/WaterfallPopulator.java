@@ -15,7 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
 
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 
 public class WaterfallPopulator extends LiminalPopulator {
@@ -33,7 +33,7 @@ public class WaterfallPopulator extends LiminalPopulator {
 
     @Override
     public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion region) {
-        final LiminalWorldPlugin plugin = getPlugin();
+        final LiminalController controller = getController();
         final int chunkGlobalX = chunkX << 4;
         final int chunkGlobalZ = chunkZ << 4;
         final int floorLevel = room.getFloorLevel();
@@ -44,7 +44,7 @@ public class WaterfallPopulator extends LiminalPopulator {
             final int commandX = chunkGlobalX + 4;
             final int commandZ = chunkGlobalZ + 4;
 
-            BlockData commandBlock = plugin.getServer().createBlockData(Material.REPEATING_COMMAND_BLOCK);
+            BlockData commandBlock = controller.getServer().createBlockData(Material.REPEATING_COMMAND_BLOCK);
             CommandBlock command = (CommandBlock)commandBlock;
             command.setConditional(false);
 
@@ -56,8 +56,8 @@ public class WaterfallPopulator extends LiminalPopulator {
                 commandState.update(true);
             }
 
-            BlockData observer1Data = plugin.getServer().createBlockData(Material.OBSERVER);
-            BlockData observer2Data = plugin.getServer().createBlockData(Material.OBSERVER);
+            BlockData observer1Data = controller.getServer().createBlockData(Material.OBSERVER);
+            BlockData observer2Data = controller.getServer().createBlockData(Material.OBSERVER);
             if (observer1Data instanceof Directional) {
                 ((Directional)observer1Data).setFacing(BlockFace.EAST);
             }
@@ -77,10 +77,10 @@ public class WaterfallPopulator extends LiminalPopulator {
             }
 
         }
-        BlockData airData = plugin.getServer().createBlockData(Material.AIR);
-        BlockData quartzData = plugin.getServer().createBlockData(Material.QUARTZ_BLOCK);
-        BlockData portalData = plugin.getServer().createBlockData(Material.END_PORTAL);
-        BlockData waterData = plugin.getServer().createBlockData(Material.WATER);
+        BlockData airData = controller.getServer().createBlockData(Material.AIR);
+        BlockData quartzData = controller.getServer().createBlockData(Material.QUARTZ_BLOCK);
+        BlockData portalData = controller.getServer().createBlockData(Material.END_PORTAL);
+        BlockData waterData = controller.getServer().createBlockData(Material.WATER);
 
         for (int relativeX = 5; relativeX <= 11; relativeX++) {
             for (int relativeZ = 5; relativeZ <= 11; relativeZ++) {

@@ -8,14 +8,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class LiminalCommandExecutor implements TabExecutor {
-    private final LiminalWorldPlugin plugin;
+    private final LiminalController controller;
 
-    public LiminalCommandExecutor(LiminalWorldPlugin plugin) {
-        this.plugin = plugin;
+    public LiminalCommandExecutor(LiminalController controller) {
+        this.controller = controller;
+        final JavaPlugin plugin = controller.getPlugin();
 
         plugin.getCommand("liminal").setExecutor(this);
         plugin.getCommand("liminal").setTabCompleter(this);
@@ -48,18 +51,18 @@ public class LiminalCommandExecutor implements TabExecutor {
             return;
         }
         Player player = (Player)sender;
-        if (!plugin.sendToLevel(player, level)) {
+        if (!controller.sendToLevel(player, level)) {
             sender.sendMessage(ChatColor.RED + "Unable to load world " + level);
         }
     }
 
     private void processGiveCommand(CommandSender sender, String playerName, String itemId) {
-        Player player = plugin.getServer().getPlayer(playerName);
+        Player player = controller.getServer().getPlayer(playerName);
         if (player == null) {
             sender.sendMessage(ChatColor.RED + "Player not found: " + playerName);
             return;
         }
-        ItemStack item = plugin.createItem(itemId);
+        ItemStack item = controller.createItem(itemId);
         if (item == null) {
             sender.sendMessage(ChatColor.RED + "Invalid item: " + itemId);
             return;
@@ -84,15 +87,15 @@ public class LiminalCommandExecutor implements TabExecutor {
         if (args.length == 2) {
             switch (args[0]) {
                 case "go":
-                    return plugin.getWorldKeys();
+                    return controller.getWorldKeys();
                 case "give":
-                    return plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+                    return controller.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
             }
         }
         if (args.length == 3) {
             switch (args[0]) {
                 case "give":
-                    return plugin.getItemKeys();
+                    return controller.getItemKeys();
             }
         }
         return null;

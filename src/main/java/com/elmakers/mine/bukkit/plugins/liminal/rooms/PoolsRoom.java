@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.elmakers.mine.bukkit.plugins.liminal.loot.FoodType;
 import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
 
@@ -110,11 +110,11 @@ public class PoolsRoom extends LiminalRoom {
             getPlugin().getLogger().warning("Invalid food type: " + foodTypeString);
         }
 
-        final LiminalWorldPlugin plugin = world.getPlugin();
-        FLOOR_BLOCKS = plugin.getMaterials(config, "floor_blocks", FLOOR_BLOCKS);
-        WALL_BLOCKS = plugin.getMaterials(config, "wall_blocks", WALL_BLOCKS);
-        CEILING_BLOCKS = plugin.getMaterials(config, "ceiling_blocks", CEILING_BLOCKS);
-        LIGHT_BLOCKS = plugin.getMaterials(config, "light_blocks", LIGHT_BLOCKS);
+        final LiminalController controller = world.getController();
+        FLOOR_BLOCKS = controller.getMaterials(config, "floor_blocks", FLOOR_BLOCKS);
+        WALL_BLOCKS = controller.getMaterials(config, "wall_blocks", WALL_BLOCKS);
+        CEILING_BLOCKS = controller.getMaterials(config, "ceiling_blocks", CEILING_BLOCKS);
+        LIGHT_BLOCKS = controller.getMaterials(config, "light_blocks", LIGHT_BLOCKS);
     }
 
     private BlockData getWindowBlock() {
@@ -135,7 +135,7 @@ public class PoolsRoom extends LiminalRoom {
 
     @Override
     public void generateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ, @NotNull ChunkData chunk) {
-        final LiminalWorldPlugin plugin = world.getPlugin();
+        final LiminalController controller = world.getController();
         final boolean isStartingChunk = chunkX == 0 && chunkZ == 0;
         final int floorLevel = FLOOR_LEVEL;
         final int roofLevel = floorLevel + RandomUtils.range(random, ROOF_MIN_HEIGHT, ROOF_MAX_HEIGHT);
@@ -184,7 +184,7 @@ public class PoolsRoom extends LiminalRoom {
         Levelled floodWater = null;
         if (isFlooded) {
             int floodLevel = RandomUtils.range(random, FLOODING_MIN_LEVEL, FLOODING_MAX_LEVEL);
-            floodWater = (Levelled)plugin.getServer().createBlockData(Material.WATER);
+            floodWater = (Levelled)controller.getServer().createBlockData(Material.WATER);
             floodWater.setLevel(floodLevel);
         }
 
@@ -272,7 +272,7 @@ public class PoolsRoom extends LiminalRoom {
 
                 // Add a dim light if no sunroof so it's not 100% dark
                 if (!hasSunRoof && x == 8 && z == 8) {
-                    GlowLichen dimLight = (GlowLichen)plugin.getServer().createBlockData(Material.GLOW_LICHEN);
+                    GlowLichen dimLight = (GlowLichen)controller.getServer().createBlockData(Material.GLOW_LICHEN);
                     dimLight.setFace(BlockFace.DOWN, true);
                     BlockData centerBlock = chunk.getBlockData(x, floorLevel, z);
                     boolean isWaterlogged = centerBlock instanceof Waterlogged && ((Waterlogged)centerBlock).isWaterlogged();

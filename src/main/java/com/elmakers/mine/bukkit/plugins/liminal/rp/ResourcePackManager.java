@@ -20,20 +20,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.plugin.Plugin;
 
-import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorldPlugin;
+import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 import com.google.common.io.BaseEncoding;
 
 public class ResourcePackManager implements Listener {
     private static final String RP_FILE = "resourcepack";
 
-    private final LiminalWorldPlugin controller;
+    private final LiminalController controller;
     private boolean resourcePacksEnabled = true;
     private String resourcePack = null;
     private long resourcePackDelay = 0;
     private boolean resourcePackDataLoaded = false;
     private final Map<String, ResourcePack> resourcePacks = new HashMap<>();
 
-    public ResourcePackManager(LiminalWorldPlugin controller) {
+    public ResourcePackManager(LiminalController controller) {
         this.controller = controller;
     }
 
@@ -97,7 +97,7 @@ public class ResourcePackManager implements Listener {
     }
 
     public boolean checkResourcePack(CommandSender sender) {
-        final Plugin plugin = controller;
+        final Plugin plugin = getPlugin();
         if (!plugin.isEnabled()) return false;
         final Server server = plugin.getServer();
         resourcePacksEnabled = true;
@@ -132,7 +132,7 @@ public class ResourcePackManager implements Listener {
     }
 
     public void updateResourcePackHash(ResourcePack resourcePack, ResourcePackResponse callback) {
-        final Plugin plugin = controller;
+        final Plugin plugin = getPlugin();
         if (!plugin.isEnabled()) return;
         final Server server = plugin.getServer();
         server.getScheduler().runTaskAsynchronously(plugin, new ResourcePackUpdateRunnable(this, resourcePack, callback));
@@ -179,7 +179,7 @@ public class ResourcePackManager implements Listener {
     }
 
     public Plugin getPlugin() {
-        return controller;
+        return controller.getPlugin();
     }
 
     @EventHandler

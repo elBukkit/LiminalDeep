@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.DeepPoolPopulator;
@@ -29,7 +30,7 @@ import com.elmakers.mine.bukkit.plugins.liminal.rooms.PoolsRoom;
 
 public class LiminalWorld {
     protected final String name;
-    protected final LiminalWorldPlugin plugin;
+    protected final LiminalController controller;
     protected final LiminalGenerator generator;
     protected final int time;
     protected final boolean rain;
@@ -53,8 +54,8 @@ public class LiminalWorld {
         CustomSound.of(Sound.AMBIENT_UNDERWATER_LOOP_ADDITIONS_ULTRA_RARE)
     };
 
-    public LiminalWorld(LiminalWorldPlugin plugin, String name, ConfigurationSection generalConfig, ConfigurationSection config) {
-        this.plugin = plugin;
+    public LiminalWorld(LiminalController controller, String name, ConfigurationSection generalConfig, ConfigurationSection config) {
+        this.controller = controller;
         this.name = name;
         time = config.getInt("time", 0);
         title = config.getString("title");
@@ -66,7 +67,7 @@ public class LiminalWorld {
             seed = config.getLong("seed");
         }
         generator = new LiminalGenerator(this, config);
-        ambientSounds = plugin.getSounds(config, "ambient_sounds", ambientSounds);
+        ambientSounds = controller.getSounds(config, "ambient_sounds", ambientSounds);
         scheduleAmbientSounds();
     }
 
@@ -75,8 +76,8 @@ public class LiminalWorld {
     }
 
     public void enter(Player player) {
-        plugin.getServer().getScheduler().runTaskLater(
-                plugin,
+        controller.getServer().getScheduler().runTaskLater(
+                getPlugin(),
                 () -> player.sendTitle(
                         ChatColor.translateAlternateColorCodes('&', title),
                         null,
@@ -100,11 +101,15 @@ public class LiminalWorld {
     }
 
     public Logger getLogger() {
-        return plugin.getLogger();
+        return controller.getLogger();
     }
 
-    public LiminalWorldPlugin getPlugin() {
-        return plugin;
+    public Plugin getPlugin() {
+        return controller.getPlugin();
+    }
+
+    public LiminalController getController() {
+        return controller;
     }
 
     public String getName() {
@@ -118,7 +123,7 @@ public class LiminalWorld {
     public World getWorld(boolean reconfigure) {
         boolean configure = reconfigure;
         if (world == null) {
-            world = plugin.getServer().getWorld(name);
+            world = controller.getServer().getWorld(name);
             configure = true;
             if (world == null) {
                 final WorldCreator creator = new WorldCreator(name).generator(generator);
@@ -131,7 +136,7 @@ public class LiminalWorld {
             }
         }
         if (world == null) {
-            plugin.getLogger().severe("Unable to create world " + name);
+            controller.getLogger().severe("Unable to create world " + name);
         } else if (configure) {
             configureWorld(world);
         }
@@ -143,12 +148,12 @@ public class LiminalWorld {
         if (rule != null) {
             world.setGameRule(rule, value);
         } else {
-            plugin.getLogger().warning("Invalid game rule: " + key);
+            controller.getLogger().warning("Invalid game rule: " + key);
         }
     }
 
     private void configureWorld(World world) {
-        final Registry<GameRule> gameRules = plugin.getServer().getRegistry(GameRule.class);
+        final Registry<GameRule> gameRules = controller.getServer().getRegistry(GameRule.class);
 
         setGameRule(gameRules, world, "ADVANCE_WEATHER", false);
         setGameRule(gameRules, world, "ADVANCE_TIME", false);
@@ -180,16 +185,16 @@ public class LiminalWorld {
     }
 
     public LiminalRoom createRoom(String id) {
-        ConfigurationSection config = plugin.getRoomConfig(id);
+        ConfigurationSection config = controller.getRoomConfig(id);
         if (config == null) {
-            plugin.getLogger().severe("Invalid room id: " + id);
+            controller.getLogger().severe("Invalid room id: " + id);
             return null;
         }
         return createRoom(config);
     }
 
     public LiminalRoom createRoom(ConfigurationSection config) {
-        config = plugin.getRoomConfig(config);
+        config = controller.getRoomConfig(config);
         final String roomType = config.getString("type", "");
         switch (roomType) {
             case "pools":
@@ -197,22 +202,22 @@ public class LiminalWorld {
             case "ocean":
                 return new OceanRoom(this, config);
             default:
-                plugin.getLogger().severe("Unknown room type: " + roomType);
+                controller.getLogger().severe("Unknown room type: " + roomType);
                 return null;
         }
     }
 
     public LiminalPopulator createPopulator(LiminalRoom room, String id) {
-        ConfigurationSection config = plugin.getPopulatorConfig(id);
+        ConfigurationSection config = controller.getPopulatorConfig(id);
         if (config == null) {
-            plugin.getLogger().severe("Invalid populator id: " + id);
+            controller.getLogger().severe("Invalid populator id: " + id);
             return null;
         }
         return createPopulator(room, config);
     }
 
     public LiminalPopulator createPopulator(LiminalRoom room, ConfigurationSection config) {
-        config = plugin.getPopulatorConfig(config);
+        config = controller.getPopulatorConfig(config);
         final String roomType = config.getString("type", "");
         switch (roomType) {
             case "waterfall":
@@ -222,7 +227,7 @@ public class LiminalWorld {
             case "loot":
                 return new LootPopulator(room, config);
             default:
-                plugin.getLogger().severe("Unknown populator type: " + roomType);
+                controller.getLogger().severe("Unknown populator type: " + roomType);
                 return null;
         }
     }
@@ -233,8 +238,8 @@ public class LiminalWorld {
         }
 
         final int soundTime = RandomUtils.range(random, minAmbientSoundTime, maxAmbientSoundTime);
-        plugin.getServer().getScheduler().runTaskLater(
-            plugin,
+        controller.getServer().getScheduler().runTaskLater(
+                getPlugin(),
             () -> {
                 final CustomSound sound = ambientSounds[random.nextInt(ambientSounds.length)];
                 sound.play(getWorld());
