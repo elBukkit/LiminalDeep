@@ -1,6 +1,8 @@
 package com.elmakers.mine.bukkit.plugins.liminal.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -8,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,12 +22,12 @@ import com.elmakers.mine.bukkit.plugins.liminal.LiminalController;
 
 public class EntityGenerator implements Listener {
     private final LiminalController controller;
-    private final NamespacedKey mobKey;
+    private final NamespacedKey entityKey;
     private final Map<String, LiminalEntity> entities = new HashMap<>();
 
     public EntityGenerator(LiminalController controller) {
         this.controller = controller;
-        this.mobKey = new NamespacedKey(controller.getPlugin(), "liminal_mob");
+        this.entityKey = new NamespacedKey(controller.getPlugin(), "id");
         final Plugin plugin = controller.getPlugin();
         plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this::checkEntities, 0, 1);
     }
@@ -95,6 +98,16 @@ public class EntityGenerator implements Listener {
         return entity != null && entity.isValid() ? entity : null;
     }
 
+    public Entity spawnEntity(String entityId, Location location) {
+        ConfigurationSection config = new MemoryConfiguration();
+        config.set("type", entityId);
+        LiminalEntity liminal = getEntity(config);
+        if (liminal == null) {
+            return null;
+        }
+        return liminal.spawn(location.getWorld(), location);
+    }
+
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
@@ -111,18 +124,22 @@ public class EntityGenerator implements Listener {
     }
 
     private String getEntityId(Entity entity) {
-        return entity.getPersistentDataContainer().get(mobKey, PersistentDataType.STRING);
+        return entity.getPersistentDataContainer().get(entityKey, PersistentDataType.STRING);
     }
 
     private boolean isLiminal(Entity entity) {
-        return entity.getPersistentDataContainer().has(mobKey);
+        return entity.getPersistentDataContainer().has(entityKey);
     }
 
     public LiminalController getController() {
         return controller;
     }
 
-    public NamespacedKey getMobKey() {
-        return mobKey;
+    public NamespacedKey getEntityKey() {
+        return entityKey;
+    }
+
+    public List<String> getEntityKeys() {
+        return new ArrayList<>(entities.keySet());
     }
 }

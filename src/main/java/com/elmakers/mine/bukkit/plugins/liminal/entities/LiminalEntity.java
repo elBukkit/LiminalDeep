@@ -45,7 +45,7 @@ public class LiminalEntity {
     public Entity spawn(RegionAccessor region, Location location) {
         final LiminalController controller = generator.getController();
         Entity entity = region.spawnEntity(location, entityType);
-        entity.getPersistentDataContainer().set(generator.getMobKey(), PersistentDataType.STRING, id);
+        entity.getPersistentDataContainer().set(generator.getEntityKey(), PersistentDataType.STRING, id);
         if (invisible && entity instanceof final LivingEntity li) {
             li.setInvisible(true);
         }

@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -44,6 +45,9 @@ public class LiminalCommandExecutor implements TabExecutor {
             case "go":
                 processGoCommand(sender, args[1]);
                 return true;
+            case "summon":
+                processSummonCommand(sender, args[1]);
+                return true;
             case "give":
                 if (args.length < 3) {
                     return false;
@@ -79,6 +83,17 @@ public class LiminalCommandExecutor implements TabExecutor {
         player.getInventory().addItem(item);
     }
 
+    private void processSummonCommand(CommandSender sender, String entityId) {
+        if (!checkPlayer(sender)) {
+            return;
+        }
+        Player player = (Player)sender;
+        Entity entity = controller.spawnEntity(entityId, player.getLocation());
+        if (entity == null) {
+            player.sendMessage(ChatColor.RED + "Invalid entity: " + entityId);
+        }
+    }
+
     private void processReloadCommand(CommandSender sender) {
         controller.reload(sender);
     }
@@ -95,7 +110,7 @@ public class LiminalCommandExecutor implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
         if (args.length == 1) {
-            return List.of("go", "give", "reload");
+            return List.of("go", "give", "reload", "summon");
         }
         if (args.length == 2) {
             switch (args[0]) {
@@ -103,6 +118,8 @@ public class LiminalCommandExecutor implements TabExecutor {
                     return controller.getWorldKeys();
                 case "give":
                     return controller.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+                case "summon":
+                    return controller.getEntityKeys();
             }
         }
         if (args.length == 3) {

@@ -15,6 +15,7 @@ import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -238,6 +239,10 @@ public class LiminalController implements Listener {
         return itemGenerator.getItemKeys();
     }
 
+    public List<String> getEntityKeys() {
+        return entityGenerator.getEntityKeys();
+    }
+
     public ConfigurationSection getRoomConfig(String id) {
         return processRoomConfig(roomConfigs.get(id));
     }
@@ -262,6 +267,10 @@ public class LiminalController implements Listener {
             return templateConfig;
         }
         return config;
+    }
+
+    public Entity spawnEntity(String entityId, Location location) {
+        return entityGenerator.spawnEntity(entityId, location);
     }
 
     public LiminalEntity getEntity(ConfigurationSection config) {
