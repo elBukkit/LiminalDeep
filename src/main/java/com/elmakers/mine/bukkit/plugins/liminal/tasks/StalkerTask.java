@@ -11,25 +11,22 @@ import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Drowned;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
+import com.elmakers.mine.bukkit.plugins.liminal.entities.LiminalEntity;
 
 public class StalkerTask implements Consumer<BukkitTask> {
     private final LiminalWorld world;
+    private final LiminalEntity entity;
     private final Map<UUID, WeakReference<Entity>> stalkers = new HashMap<>();
 
-    public StalkerTask(LiminalWorld world) {
+    public StalkerTask(LiminalWorld world, LiminalEntity entity) {
         this.world = world;
+        this.entity = entity;
     }
 
     protected Entity spawnStalker(Player stalked) {
@@ -39,23 +36,11 @@ public class StalkerTask implements Consumer<BukkitTask> {
             spawnLocation.add(0, 1, 0);
         }
         spawnLocation.add(0, 4, 0);
-        Drowned drowned = (Drowned)world.getWorld().spawnEntity(spawnLocation, EntityType.DROWNED);
-        ItemStack stalkerItem = new ItemStack(Material.TORCH);
-        ItemMeta itemMeta = stalkerItem.getItemMeta();
-        itemMeta.setCustomModelData(8888);
-        stalkerItem.setItemMeta(itemMeta);
-        drowned.getAttribute(Attribute.SCALE).setBaseValue(10);
-        drowned.getEquipment().setHelmet(stalkerItem);
-        drowned.addPotionEffect(new PotionEffect(
-            PotionEffectType.INVISIBILITY,
-            PotionEffect.INFINITE_DURATION,
-            1,
-            true,
-            false,
-            false
-        ));
-        drowned.setTarget(stalked);
-        return drowned;
+        Entity entity = this.entity.spawn(world.getWorld(), spawnLocation);
+        if (entity instanceof final Mob mob) {
+            mob.setTarget(stalked);
+        }
+        return entity;
 
     }
 

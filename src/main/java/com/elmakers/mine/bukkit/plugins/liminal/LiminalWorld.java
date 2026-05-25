@@ -18,6 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.elmakers.mine.bukkit.plugins.liminal.entities.LiminalEntity;
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.DeepPoolPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
@@ -27,6 +28,7 @@ import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.OceanRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.PoolsRoom;
+import com.elmakers.mine.bukkit.plugins.liminal.tasks.StalkerTask;
 
 public class LiminalWorld {
     protected final String name;
@@ -69,6 +71,17 @@ public class LiminalWorld {
         generator = new LiminalGenerator(this, config);
         ambientSounds = controller.getSounds(config, "ambient_sounds", ambientSounds);
         scheduleAmbientSounds();
+
+        final ConfigurationSection stalkerConfig = config.getConfigurationSection("stalker");
+        final LiminalEntity stalkerEntity = controller.getEntity(stalkerConfig);
+        if (stalkerEntity != null) {
+            getPlugin().getServer().getScheduler().runTaskTimer(
+                    getPlugin(),
+                    new StalkerTask(this, stalkerEntity),
+                    0L,
+                    10L
+            );
+        }
     }
 
     public String getNextLevel(Location location) {

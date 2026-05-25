@@ -10,7 +10,6 @@ import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 
 import com.elmakers.mine.bukkit.plugins.liminal.LiminalWorld;
-import com.elmakers.mine.bukkit.plugins.liminal.tasks.StalkerTask;
 
 public class OceanRoom extends LiminalRoom {
     private int SEA_LEVEL = 190;
@@ -19,13 +18,6 @@ public class OceanRoom extends LiminalRoom {
 
     public OceanRoom(LiminalWorld world, ConfigurationSection config) {
         super(world, config);
-
-        getPlugin().getServer().getScheduler().runTaskTimer(
-            getPlugin(),
-            new StalkerTask(world),
-            0L,
-            10L
-        );
     }
 
     @Override

@@ -18,15 +18,24 @@ items:
   kelp_shears:
     name: "&bKelp Shears"
     item: shears[minecraft:can_break={blocks:["minecraft:kelp_plant","minecraft:kelp"]}]
-  hopper_helmet:
+  hopper:
     name: "&0Hopper"
     item: stick[custom_model_data={floats:[8888]}]
+  leviathan:
+    name: "&0Leviathan"
+    item: torch[custom_model_data={floats:[8888]}]
 
 entities:
   hopper:
     type: rabbit
-    item: hopper_helmet
+    item: hopper
     rotation_speed: 8
+  leviathan:
+    type: drowned
+    item: leviathan
+    item_scale: 50
+    persistent: false
+    rotation_speed: 1
 
 populators:
 
@@ -314,7 +323,7 @@ rooms:
 
   ocean:
     type: ocean
-    sea_level: 190
+    sea_level: 95
     sand_level: 6
     bedrock_level: 1
 
@@ -361,6 +370,8 @@ worlds:
     title: "&8The Abyss"
     biome: deep_ocean
     time: 18000
+    stalker:
+      type: leviathan
     rooms:
       - ocean
 

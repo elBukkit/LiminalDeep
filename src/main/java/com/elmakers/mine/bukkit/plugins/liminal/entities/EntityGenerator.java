@@ -86,6 +86,9 @@ public class EntityGenerator implements Listener {
     }
 
     public LiminalEntity getEntity(ConfigurationSection config) {
+        if (config == null) {
+            return null;
+        }
         final String typeId = config.getString("type");
         if (typeId == null) {
             controller.getLogger().warning("Entity configuration missing type");
