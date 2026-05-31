@@ -83,6 +83,9 @@ public class LiminalEntity {
         if (name != null) {
             entity.setCustomName(name);
         }
+        if (entity instanceof final LivingEntity li) {
+            li.getEquipment().clear();
+        }
         return entity;
     }
 
