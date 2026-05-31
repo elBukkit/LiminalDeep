@@ -27,10 +27,12 @@ items:
 
 entities:
   hopper:
+    name: "Little Hopper"
     type: rabbit
     item: hopper
     rotation_speed: 8
   leviathan:
+    name: "Leviathan Stalker"
     type: drowned
     item: leviathan
     item_scale: 50

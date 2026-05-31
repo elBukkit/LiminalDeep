@@ -26,6 +26,7 @@ public class LiminalEntity {
     private final double scale;
     private final double itemScale;
     private final boolean persistent;
+    private final String name;
 
     public LiminalEntity(EntityGenerator generator, String id, ConfigurationSection config) {
         this.generator = generator;
@@ -44,6 +45,7 @@ public class LiminalEntity {
         scale = config.getDouble("scale", 1.0);
         itemScale = config.getDouble("item_scale", 1.0);
         persistent = config.getBoolean("persistent", true);
+        name = config.getString("name");
     }
 
     public boolean isValid() {
@@ -77,6 +79,9 @@ public class LiminalEntity {
                 }
                 itemDisplay.setPersistent(persistent);
             }
+        }
+        if (name != null) {
+            entity.setCustomName(name);
         }
         return entity;
     }
