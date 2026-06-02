@@ -143,6 +143,11 @@ public abstract class LiminalRoom extends ChunkGenerator {
         return null;
     }
 
+    @Override
+    public Location getFixedSpawnLocation(World world, Random random) {
+        return getSpawnLocation(world);
+    }
+
     public abstract int getFloorLevel();
 
     public abstract int getBedrockLevel();

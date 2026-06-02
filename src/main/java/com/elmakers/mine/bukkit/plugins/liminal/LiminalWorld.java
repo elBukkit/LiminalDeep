@@ -22,9 +22,11 @@ import com.elmakers.mine.bukkit.plugins.liminal.entities.LiminalEntity;
 import com.elmakers.mine.bukkit.plugins.liminal.generator.LiminalGenerator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.DeepPoolPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LiminalPopulator;
+import com.elmakers.mine.bukkit.plugins.liminal.populator.StructurePopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.WaterfallPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.populator.LootPopulator;
 import com.elmakers.mine.bukkit.plugins.liminal.random.RandomUtils;
+import com.elmakers.mine.bukkit.plugins.liminal.rooms.FlatRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.LiminalRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.OceanRoom;
 import com.elmakers.mine.bukkit.plugins.liminal.rooms.PoolsRoom;
@@ -214,6 +216,8 @@ public class LiminalWorld {
                 return new PoolsRoom(this, config);
             case "ocean":
                 return new OceanRoom(this, config);
+            case "flat":
+                return new FlatRoom(this, config);
             default:
                 controller.getLogger().severe("Unknown room type: " + roomType);
                 return null;
@@ -239,6 +243,8 @@ public class LiminalWorld {
                 return new DeepPoolPopulator(room, config);
             case "loot":
                 return new LootPopulator(room, config);
+            case "structure":
+                return new StructurePopulator(room, config);
             default:
                 controller.getLogger().severe("Unknown populator type: " + roomType);
                 return null;

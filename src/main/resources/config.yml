@@ -1,7 +1,7 @@
 general:
   version: 2
   title_delay: 8000
-  default_world: pools
+  default_world: concrete
   resource_pack: "https://rp.elmakers.com/LiminalDeep-RP-1.0.zip"
 
 items:
@@ -40,6 +40,13 @@ entities:
     rotation_speed: 1
 
 populators:
+
+  concrete_structure:
+    type: structure
+
+  concrete_exit:
+    type: structure
+    next_level: pools
 
   pools_exit:
     type: waterfall
@@ -123,6 +130,25 @@ populators:
     exit_level: -60
 
 rooms:
+
+  concrete:
+    type: flat
+
+  concrete_structure:
+    type: flat
+    min_distance: 32
+    max_distance: 64
+    weight: 0.05
+    populators:
+      - concrete_structure
+
+  concrete_exit:
+    type: flat
+    min_distance: 640
+    max_distance: 3200
+    weight: 0.1
+    populators:
+      - concrete_exit
 
   pools:
     type: pools
@@ -330,6 +356,18 @@ rooms:
     bedrock_level: 1
 
 worlds:
+
+  concrete:
+    min_ambient_sound_time: 90
+    max_ambient_sound_time: 900
+    title_delay: 2000
+    title: "&8The Concrete Wastes"
+    time: 6000
+    biome: basalt_deltas
+    rooms:
+      - concrete
+      - concrete_structure
+      - concrete_exit
 
   pools:
     min_ambient_sound_time: 60
