@@ -46,7 +46,6 @@ public class FlatRoom extends LiminalRoom {
                 noise = new PerlinNoiseGenerator(worldInfo.getSeed());
             }
         }
-        final int minY = worldInfo.getMinHeight();
         final int groundLevel = GROUND_LEVEL;
         final int bedrockLevel = BEDROCK_LEVEL;
         for (int x = 0; x < 16; x++) {

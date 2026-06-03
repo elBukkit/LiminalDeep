@@ -46,6 +46,7 @@ populators:
 
   concrete_exit:
     type: structure
+    exit_probability: 1
     next_level: pools
 
   pools_exit:
