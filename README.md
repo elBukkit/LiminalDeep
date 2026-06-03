@@ -41,3 +41,11 @@ https://modrinth.com/resourcepack/re-shaded
 Wavy Water by AlphaLeoli:
 
 https://www.planetminecraft.com/texture-pack/wavey-water-vanilla-no-optifine-mods-required/
+
+End Windows:
+
+cornelia
+
+Skybox:
+
+https://opengameart.org/content/sky-box-sunny-day#
