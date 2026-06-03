@@ -134,6 +134,7 @@ rooms:
 
   concrete:
     type: flat
+    food_probability: 0.05
 
   concrete_structure:
     type: flat

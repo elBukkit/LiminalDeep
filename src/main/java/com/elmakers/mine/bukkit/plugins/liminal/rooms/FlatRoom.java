@@ -5,6 +5,8 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.util.noise.PerlinNoiseGenerator;
@@ -18,6 +20,7 @@ public class FlatRoom extends LiminalRoom {
     private double noiseScale = 0.1;
     private int GROUND_LEVEL = 2;
     private int BEDROCK_LEVEL = 1;
+    private double FOOD_PROBABILITY = 0;
 
     private Material[] FLOOR_BLOCKS = {
             Material.BLACK_CONCRETE,
@@ -35,6 +38,7 @@ public class FlatRoom extends LiminalRoom {
         final LiminalController controller = world.getController();
         GROUND_LEVEL = config.getInt("ground_level", GROUND_LEVEL);
         BEDROCK_LEVEL = config.getInt("bedrock_level", BEDROCK_LEVEL);
+        FOOD_PROBABILITY = config.getDouble("food_probability", FOOD_PROBABILITY);
         noiseScale = config.getDouble("noise_scale", noiseScale);
         FLOOR_BLOCKS = controller.getMaterials(config, "floor_blocks", FLOOR_BLOCKS);
     }
@@ -46,6 +50,7 @@ public class FlatRoom extends LiminalRoom {
                 noise = new PerlinNoiseGenerator(worldInfo.getSeed());
             }
         }
+        final boolean hasFood = random.nextDouble() < FOOD_PROBABILITY;
         final int groundLevel = GROUND_LEVEL;
         final int bedrockLevel = BEDROCK_LEVEL;
         for (int x = 0; x < 16; x++) {
@@ -59,17 +64,24 @@ public class FlatRoom extends LiminalRoom {
                 for (int y = bedrockLevel + 1; y <= groundLevel; y++) {
                     chunk.setBlock(x, y, z, floorBlock);
                 }
+                chunk.setBlock(x, BEDROCK_LEVEL, z, Material.BEDROCK);
             }
         }
-    }
 
-    @Override
-    public void generateBedrock(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ, @NotNull ChunkData chunk) {
-        final int minY = worldInfo.getMinHeight();
-        final int bedrockLevel = minY + BEDROCK_LEVEL;
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                chunk.setBlock(x, bedrockLevel, z, Material.BEDROCK);
+        if (hasFood) {
+            final BlockData blockData = getPlugin().getServer().createBlockData(Material.CARROTS);
+            if (blockData instanceof Ageable) {
+                Ageable crops = (Ageable)blockData;
+                crops.setAge(crops.getMaximumAge());
+            }
+            for (int x = 6; x < 10; x++) {
+                for (int z = 6; z < 10; z++) {
+                    if (x == 6 || x == 9 || z == 6 || z == 9) {
+                        chunk.setBlock(x, groundLevel + 1, z, Material.PALE_OAK_PRESSURE_PLATE);
+                    } else {
+                        chunk.setBlock(x, groundLevel + 1, z, blockData);
+                    }
+                }
             }
         }
     }
